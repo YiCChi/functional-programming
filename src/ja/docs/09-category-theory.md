@@ -4,11 +4,11 @@
 
 > では、どのように問題解決を図るのだろうか？ 大きな問題を小さな問題に分解する。分解後の問題が依然として大きければ、さらに分解し続けるのである。最終的には、小さな問題を解くコードのみを書くことになる。こうして、プログラミングの神髄に至るのだ： 大きな問題を解く際に、小さなコードを組み合わせるのである。小さなピースを元に戻せないのであれば、分解することなどまったくもって意味などない。 - Bartosz Milewski
 
-この文章は一体何を言わんとしているのだろうか？ 2つのものが _組み合わさっている_ とはどういうことなのだろうか？ _上手く_ 組み合わせるとはどういうことなのだろうか？
+この文章は一体何を言わんとしているのでしょう？ 2つのものが _組み合わさっている_ とはどういうことなのでしょうか？ _上手く_ 組み合わせるとはどういうことなのでしょうか？
 
 > 複数のエンティティを、その中身を変更することなく、何らかの方法でそれらの振る舞いを、簡単に、かつ一般に合成できるのであれば、それらのエンティティは合成可能であると言うことができる。私は、合成可能性というものは、プログラミング・モデルにおいて、簡潔かつ高度な表現力の再利用・組み合わせのカギとなるものであると考えている。 - Paul Chiusano
 
-関数型でプログラムを書いていると、しばしば pipeline のようになるということは先に述べた。
+関数型でプログラムを書いていると、しばしば pipeline のようになるということは先に述べました。
 
 ```ts
 const program = pipe(
@@ -20,8 +20,8 @@ const program = pipe(
 )
 ```
 
-しかし、こんな風に書けたなら、どれだけ簡潔だろうか？
-ちょっとやってみよう。
+しかし、こんな風に書けたなら、どれだけ簡潔でしょうか？
+ちょっとやってみましょう。
 
 ```ts
 import { pipe } from 'fp-ts/function'
@@ -40,25 +40,25 @@ const program = (input: ReadonlyArray<number>): number =>
   )
 ```
 
-なぜコンパイル・エラーが起きるのだろうか？
-それは、`head` と `double` が合成可能でないからだ。
+なぜコンパイル・エラーが起きるのでしょうか？
+それは、`head` と `double` が合成可能でないからです。
 
 ```ts
 head: (as: ReadonlyArray<number>) => Option<number>
 double: (n: number) => number
 ```
 
-`head` の終域が `double` の終域を含んでいないからである.
+`head` の戻りの型が `double` の引数の型に変換不可能だからです。
 
-Looks like our goal to program using pure functions is over..Or is it?
+純粋関数でプログラミングするという我々の目標はここで終わりのようです……そうでしょうか？
 
-We need to be able to refer to some **rigorous theory**, one able to answer such fundamental questions.
+この根本的な問いに答えるべく、なんらかの **厳密な理論** を参照する必要があります。
 
-We need to refer to a **formal definition** of composability.
+合成可能性の **形式的定義** を参照する必要があります。
 
-Luckily, for the last 70 years ago, a large number of researchers, members of the oldest and largest humanity's open source project (mathematics) occupied itself with developing a theory dedicated to composability: **category theory**, a branch of mathematics founded by Saunders Mac Lane along Samuel Eilenberg (1945).
+幸運なことに、直近70年、人類最古の、そして人類最大のオープンソースプロジェクト（数学のこと）の大量のメンバが、合成可能性のための理論の研究に専念してきました。圏論です。Saunders Mac Lane, Samuel Eilenberg (1945) で確立された数学の一分野です。
 
-> Categories capture the essence of composition.
+> 圏は、合成の本質を捉える。
 
 Saunders Mac Lane
 
@@ -73,72 +73,75 @@ Saunders Mac Lane
 
 </center>
 
-We'll see in the following chapters how a category can form the basis for:
+以下の章では、圏が
 
-- a model for a generic **programming language**
-- a model for the concept of **composition**
+- **プログラミング言語** 全般に通ずるモデル
+- **合成** という概念のモデル
 
-## Definition
+の基礎を成していることを見ていきます。
 
-The definition of a category, even though it isn't really complex, is a bit long, thus I'll split it in two parts:
+## 定義
 
-- the first is merely technical (we need to define its constituents)
-- the second one will be more relevant to what we care for: a notion of composition
+圏の定義は、実際にはそこまで複雑ではありませんが、やや長いため、2つの部分に分けて説明します。
 
-### Part I (Constituents)
+- 最初の部分は純粋に技術的な内容です（構成要素を定義する必要があります）。
+- 2つ目の部分は、私たちの関心事である合成の概念に関するものです。
 
-A category is a pair of `(Objects, Morphisms)` where:
 
-- `Objects` is a collection of **objects**
-- `Morphisms` is a collection of **morphisms** (also called "arrows") between objects
+### 第1部 (構成要素)
 
-**Note**. The term "object" has nothing to do with the concept of "objects" in programming. Just think about those "objects" as black boxes we can't inspect, or simple placeholders useful to define the various morphisms.
+圏とは、(対象, 射) のペアであり、以下のような構成要素から成り立っています：
 
-Every morphism `f` owns a source object `A` and a target object `B`.
+- `対象` は **対象** の集合です
+- `射` は、対象間の **射** （または"矢印"とも呼ばれる） の集合です
 
-In every morphism, both `A` and `B` are members of `Objects`. We write `f: A ⟼ B` and we say that "f is a morphism from A to B".
+**注** 「対象」という用語は英語で `object` ですが、プログラミングの「オブジェクト」の概念とは何の関係もありません。単に、検査できないブラックボックスであると、あるいは、様々な射を定義するための便利なプレースホルダーであると考えてください。
+
+すべての射 `f` には、出発点の対象 `A` と到着点の対象 `B` があります。
+
+すべての射において、 `A` と `B` は `対象` の内の一つです。`f: A ⟼ B` と書き、"f は A から B への射である" と言います。
 
 <img src="images/morphism.png" width="300" alt="A morphism" />
 
-**Note**. For simplicity, from now on, I'll use labels only for objects, skipping the circles.
+**注** 以下、便宜上、対象を図示する際には名前のみ示すことにし、丸は省略します。
 
-### Part II (Composition)
+### 第2部 (合成)
 
-There is an operation, `∘`, called "composition", such as the following properties hold true:
+「合成」と呼ばれる演算子 ∘ があり、以下の性質が成り立つとします：
 
-- (**composition of morphisms**) every time we have two morphisms `f: A ⟼ B` and `g: B ⟼ C` in `Morphisms` then there has to be a third morphism `g ∘ f: A ⟼ C` in `Morphisms` which is the _composition_ of `f` and `g`
+- (**射の合成**) `射の集合` 内に2つの射 `f: A ⟼ B` と `g: B ⟼ C` がある場合、`f` と `g` の合成となる第3の射 `g ∘ f: A ⟼ C` も `射の集合` 内に存在する必要があります。
 
 <img src="images/composition.png" width="300" alt="composition" />
 
-- (**associativity**) if `f: A ⟼ B`, `g: B ⟼ C` and `h: C ⟼ D` then `h ∘ (g ∘ f) = (h ∘ g) ∘ f`
+- (**結合法則**) `f: A ⟼ B`、`g: B ⟼ C`、`h: C ⟼ D` ならば、`h ∘ (g ∘ f) = (h ∘ g) ∘ f` が成り立ちます。
 
 <img src="images/associativity.png" width="500" alt="associativity" />
 
-- (**identity**) for every object `X`, there is a morphism `identity: X ⟼ X` called _identity morphism_ of `X`, such as for every morphism `f: A ⟼ X` and `g: X ⟼ B`, the following equation holds true `identity ∘ f = f` and `g ∘ identity = g`.
+- (**単位元**) すべての対象 `X` に対して、`identity: X ⟼ X` という名前の _恒等射_ が存在し、すべての射 `f: A ⟼ X` および `g: X ⟼ B` に対して、`identity ∘ f = f` および `g ∘ identity = g` が成り立ちます
 
 <img src="images/identity.png" width="300" alt="identity" />
 
-**Example**
+**例**
 
 <img src="images/category.png" width="300" alt="a simple category" />
 
-This category is very simple, there are three objects and six morphisms (1<sub>A</sub>, 1<sub>B</sub>, 1<sub>C</sub> are the identity morphisms for `A`, `B`, `C`).
+この圏は非常に単純です。3つの対象と6つの射が存在します（1<sub>A</sub>、1<sub>B</sub>、1<sub>C</sub> はそれぞれ A、B、C の恒等射です）。
 
-## Modeling programming languages with categories
+## 圏を用いたプログラミング言語のモデリング
 
-A category can be seen as a simplified model for a **typed programming language**, where:
+圏は、**型付けされたプログラミング言語** の簡略モデルとして考えることができます。以下のように対応します。
 
-- objects are **types**
-- morphisms are **functions**
-- `∘` is the usual **function composition**
+- 対象は **型**
+- 射は **型**
+- `∘` は通常の **関数合成**
 
-The following diagram:
+以下の図で考えると、
 
 <img src="images/category.png" width="300" alt="a simple programming language" />
 
-can be seen as an imaginary (and simple) programming language with just three types and six functions
+3つの型と6つの関数だけからなる、架空の（そして単純な）プログラミング言語として考えることができます。
 
-Example given:
+例:
 
 - `A = string`
 - `B = number`
@@ -147,7 +150,7 @@ Example given:
 - `g = number => boolean`
 - `g ∘ f = string => boolean`
 
-The implementation could be something like:
+実装は以下のようなものが想定できます。
 
 ```ts
 const idA = (s: string): string => s
@@ -164,20 +167,20 @@ const g = (n: number): boolean => n > 2
 const gf = (s: string): boolean => g(f(s))
 ```
 
-## A category for TypeScript
+## TypeScript における圏
 
-We can define a category, let's call it _TS_, as a simplified model of the TypeScript language, where:
+簡略化された TypeScript のモデルとしての圏を定義することもできます。この圏を _TS_ と呼びましょう。以下のような特徴を持ちます：
 
-- **objects** are all the possible TypeScript types: `string`, `number`, `ReadonlyArray<string>`, etc...
-- **morphisms** are all TypeScript functions: `(a: A) => B`, `(b: B) => C`, ... where `A`, `B`, `C`, ... are TypeScript types
-- the **identity morphisms** are all encoded in a single polymorphic function `const identity = <A>(a: A): A => a`
-- **morphism's composition** is the usual function composition (which we know to be associative)
+- **対象** は TypeScript に存在しうるすべての型です: `string`, `number`, `ReadonlyArray<string>`, など。
+- **射** は TypeScript のすべての関数です: `(a: A) => B`, `(b: B) => C`, など。ここで `A`, `B`, `C`, などは TypeScript の型です。
+- **恒等射** はすべて、1つの多層的関数に集約されています。 `const identity = <A>(a: A): A => a`
+- **射の合成** は通常の関数合成です (これは結合法則を満たすことが知られています)。
 
-As a model of TypeScript, the _TS_ category may seem a bit limited: no loops, no `if`s, there's _almost_ nothing... that being said that simplified model is rich enough to help us reach our goal: to reason about a well-defined notion of composition.
+TypeScriptのモデルとして、圏_TS_ はやや制約があるように見えるかもしれません。ループもなく、`if` もありません。_ほとんど_何もありません…… にもかかわらず、この簡略モデルは、目標である well-defined な合成の概念について考えるのに十分です。
 
-## Composition's core problem
+## 合成の中核的な問題
 
-In the _TS_ category we can compose two generic functions `f: (a: A) => B` and `g: (c: C) => D` as long as `C = B`
+圏 _TS_ では、`C = B` ならば、2つのジェネリックな関数 `f: (a: A) => B` and `g: (c: C) => D` を合成することができます。
 
 ```ts
 function flow<A, B, C>(f: (a: A) => B, g: (b: B) => C): (a: A) => C {
@@ -189,20 +192,20 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 }
 ```
 
-But what happens if `B != C`? How can we compose two such functions? Should we give up?
+しかし、`B != C` の場合はどうなるのでしょう？このような関数をどのように合成すれば良いのでしょうか？諦めるべきでしょうか？
 
-In the next section we'll see under which conditions such a composition is possible.
+次のセクションでは、そのような合成が可能な条件について見ていきます。
 
-**Spoiler**
+**ネタバレ**
 
-- to compose `f: (a: A) => B` with `g: (b: B) => C` we use our usual function composition
-- to compose `f: (a: A) => F<B>` with `g: (b: B) => C` we need a **functor** instance for `F`
-- to compose `f: (a: A) => F<B>` with `g: (b: B, c: C) => D` we need an **applicative functor** instance for `F`
-- to compose `f: (a: A) => F<B>` with `g: (b: B) => F<C>` we need a **monad** instance for `F`
+- `f: (a: A) => B` と `g: (b: B) => C` を合成するには、通常の関数合成を使用します
+- `f: (a: A) => F<B>` と `g: (b: B) => C` を合成するには、`F` の **関手** インスタンスが必要です
+- `f: (a: A) => F<B>` と `g: (b: B, c: C) => D` を合成するには、`F` の **Applicative 関手** インスタンスが必要です
+- `f: (a: A) => F<B>` と `g: (b: B) => F<C>` を合成するには、`F` の **モナド** インスタンスが必要です
 
 <img src="images/spoiler.png" width="900" alt="The four composition recipes" />
 
-The problem we started with at the beginning of this chapter corresponds to the second situation, where `F` is the `Option` type:
+この章の初めに取り組んだ問題は、`F` が `Option` 型の場合、つまり次のような場合に対応します:
 
 ```ts
 // A = ReadonlyArray<number>, B = number, F = Option
@@ -210,4 +213,4 @@ head: (as: ReadonlyArray<number>) => Option<number>
 double: (n: number) => number
 ```
 
-To solve it, the next chapter will talk about functors.
+この問題を解決するために、次の章では関手について話します。
