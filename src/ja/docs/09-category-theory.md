@@ -20,7 +20,7 @@ const program = pipe(
 )
 ```
 
-しかし、こんな風に書けたなら、どれだけ簡潔でしょうか？
+こんな風にコーディングすることで、どのぐらい簡潔になるのでしょうか？
 ちょっとやってみましょう。
 
 ```ts
@@ -63,11 +63,11 @@ double: (n: number) => number
 Saunders Mac Lane
 
 <center>
-<img src="images/maclane.jpg" width="300" alt="Saunders Mac Lane" />
+<img src="../../images/maclane.jpg" width="300" alt="Saunders Mac Lane" />
 
 (Saunders Mac Lane)
 
-<img src="images/eilenberg.jpg" width="300" alt="Samuel Eilenberg" />
+<img src="../../images/eilenberg.jpg" width="300" alt="Samuel Eilenberg" />
 
 (Samuel Eilenberg)
 
@@ -90,18 +90,18 @@ Saunders Mac Lane
 
 ### 第1部 (構成要素)
 
-圏とは、(対象, 射) のペアであり、以下のような構成要素から成り立っています：
+圏とは、`(対象, 射)` のペアであり、以下のような構成要素から成り立っています：
 
 - `対象` は **対象** の集合です
-- `射` は、対象間の **射** （または"矢印"とも呼ばれる） の集合です
+- `射` は、対象間の **射** （"矢印"とも呼ばれる） の集合です
 
 **注** 「対象」という用語は英語で `object` ですが、プログラミングの「オブジェクト」の概念とは何の関係もありません。単に、検査できないブラックボックスであると、あるいは、様々な射を定義するための便利なプレースホルダーであると考えてください。
 
 すべての射 `f` には、出発点の対象 `A` と到着点の対象 `B` があります。
 
-すべての射において、 `A` と `B` は `対象` の内の一つです。`f: A ⟼ B` と書き、"f は A から B への射である" と言います。
+すべての射において、 `A` と `B` は `対象` の内の一つです。`f: A ⟼ B` と書き、「f は A から B への射である」と言います。
 
-<img src="images/morphism.png" width="300" alt="A morphism" />
+<img src="../../images/morphism.png" width="300" alt="A morphism" />
 
 **注** 以下、便宜上、対象を図示する際には名前のみ示すことにし、丸は省略します。
 
@@ -111,19 +111,19 @@ Saunders Mac Lane
 
 - (**射の合成**) `射の集合` 内に2つの射 `f: A ⟼ B` と `g: B ⟼ C` がある場合、`f` と `g` の合成となる第3の射 `g ∘ f: A ⟼ C` も `射の集合` 内に存在する必要があります。
 
-<img src="images/composition.png" width="300" alt="composition" />
+<img src="../../images/composition.png" width="300" alt="composition" />
 
 - (**結合法則**) `f: A ⟼ B`、`g: B ⟼ C`、`h: C ⟼ D` ならば、`h ∘ (g ∘ f) = (h ∘ g) ∘ f` が成り立ちます。
 
-<img src="images/associativity.png" width="500" alt="associativity" />
+<img src="../../images/associativity.png" width="500" alt="associativity" />
 
 - (**単位元**) すべての対象 `X` に対して、`identity: X ⟼ X` という名前の _恒等射_ が存在し、すべての射 `f: A ⟼ X` および `g: X ⟼ B` に対して、`identity ∘ f = f` および `g ∘ identity = g` が成り立ちます
 
-<img src="images/identity.png" width="300" alt="identity" />
+<img src="../../images/identity.png" width="300" alt="identity" />
 
 **例**
 
-<img src="images/category.png" width="300" alt="a simple category" />
+<img src="../../images/category.png" width="300" alt="a simple category" />
 
 この圏は非常に単純です。3つの対象と6つの射が存在します（1<sub>A</sub>、1<sub>B</sub>、1<sub>C</sub> はそれぞれ A、B、C の恒等射です）。
 
@@ -137,7 +137,7 @@ Saunders Mac Lane
 
 以下の図で考えると、
 
-<img src="images/category.png" width="300" alt="a simple programming language" />
+<img src="../../images/category.png" width="300" alt="a simple programming language" />
 
 3つの型と6つの関数だけからなる、架空の（そして単純な）プログラミング言語として考えることができます。
 
@@ -203,7 +203,7 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 - `f: (a: A) => F<B>` と `g: (b: B, c: C) => D` を合成するには、`F` の **Applicative 関手** インスタンスが必要です
 - `f: (a: A) => F<B>` と `g: (b: B) => F<C>` を合成するには、`F` の **モナド** インスタンスが必要です
 
-<img src="images/spoiler.png" width="900" alt="The four composition recipes" />
+<img src="../../images/spoiler.png" width="900" alt="The four composition recipes" />
 
 この章の初めに取り組んだ問題は、`F` が `Option` 型の場合、つまり次のような場合に対応します:
 
