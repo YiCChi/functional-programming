@@ -162,33 +162,34 @@ function flow<A, B, C>(f: (a: A) => B, g: (b: B) => C): (a: A) => C {
 
 しかし、そうでない場合はどうでしょうか？
 
-## A boundary that leads to functors
+## 関手へと導く制約
 
-Let's consider the following boundary: `B = F<C>` for some type constructor `F`, we have the following situation:
+制約を考えていきましょう。
+ある型コンストラクタ `F` に対して `B = F<C>` であり、以下が成り立つとします。
 
-- `f: (a: A) => F<B>` is an effectful program
-- `g: (b: B) => C` is a pure program
+- `f: (a: A) => F<B>` は作用プログラム
+- `g: (b: B) => C` は純粋プログラム
 
-In order to compose `f` with `g` we need to find a procedure that allows us to derive a function `g` from a function `(b: B) => C` to a function `(fb: F<B>) => F<C>` in order to use the usual function composition (this way the codomain of `f` would be the same of the new function's domain).
+`f` と `g` を通常の関数合成で合成するには、`g` を `(b: B) => C` から `(fb: F<B>) => F<C>` に変換する処理が必要です（これによって `f` の戻り値の型と新たに生み出した関数の引数の型が一致します）。
 
 <img src="../../images/map.png" width="500" alt="map" />
 
-We have mutated the original problem in a new one: can we find a function, let's call it `map`, that operates this way?
+問題の言い換えを行いました。では上で述べたような処理を行う関数（`map` と呼ぶことにします）を見つけることができるでしょうか？
 
-Let's see some practical example:
+実際の例を見てみましょう：
 
-**Example** (`F = ReadonlyArray`)
+**例** (`F = ReadonlyArray`)
 
 ```ts
 import { flow, pipe } from 'fp-ts/function'
 
-// transforms functions `B -> C` to functions `ReadonlyArray<B> -> ReadonlyArray<C>`
+// 関数 `B -> C` を、関数 `ReadonlyArray<B> -> ReadonlyArray<C>` に変換する
 const map = <B, C>(g: (b: B) => C) => (
   fb: ReadonlyArray<B>
 ): ReadonlyArray<C> => fb.map(g)
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 interface User {
@@ -203,7 +204,7 @@ const getName = (user: User): string => user.name
 // getFollowersNames: User -> ReadonlyArray<string>
 const getFollowersNames = flow(getFollowers, map(getName))
 
-// let's use `pipe` instead of `flow`...
+// `flow` の代わりに `pipe` を使ってみると……
 export const getFollowersNames2 = (user: User) =>
   pipe(user, getFollowers, map(getName))
 
@@ -219,13 +220,13 @@ const user: User = {
 console.log(getFollowersNames(user)) // => [ 'Terry R. Emerson', 'Marsha J. Joslyn' ]
 ```
 
-**Example** (`F = Option`)
+**例** (`F = Option`)
 
 ```ts
 import { flow } from 'fp-ts/function'
 import { none, Option, match, some } from 'fp-ts/Option'
 
-// transforms functions `B -> C` to functions `Option<B> -> Option<C>`
+// 関数 `B -> C` を、関数 `Option<B> -> Option<C>` に変換する
 const map = <B, C>(g: (b: B) => C): ((fb: Option<B>) => Option<C>) =>
   match(
     () => none,
@@ -236,7 +237,7 @@ const map = <B, C>(g: (b: B) => C): ((fb: Option<B>) => Option<C>) =>
   )
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 import * as RA from 'fp-ts/ReadonlyArray'
@@ -251,20 +252,20 @@ console.log(getDoubleHead([1, 2, 3])) // => some(2)
 console.log(getDoubleHead([])) // => none
 ```
 
-**Example** (`F = IO`)
+**例** (`F = IO`)
 
 ```ts
 import { flow } from 'fp-ts/function'
 import { IO } from 'fp-ts/IO'
 
-// transforms functions `B -> C` to functions `IO<B> -> IO<C>`
+// 関数 `B -> C` を、関数 `IO<B> -> IO<C>` に変換する
 const map = <B, C>(g: (b: B) => C) => (fb: IO<B>): IO<C> => () => {
   const b = fb()
   return g(b)
 }
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 interface User {
@@ -272,7 +273,7 @@ interface User {
   readonly name: string
 }
 
-// a dummy in-memory database
+// ダミーのインメモリデータベース
 const database: Record<number, User> = {
   1: { id: 1, name: 'Ruth R. Gonzalez' },
   2: { id: 2, name: 'Terry R. Emerson' },
@@ -288,20 +289,20 @@ const getUserName = flow(getUser, map(getName))
 console.log(getUserName(1)()) // => Ruth R. Gonzalez
 ```
 
-**Example** (`F = Task`)
+**例** (`F = Task`)
 
 ```ts
 import { flow } from 'fp-ts/function'
 import { Task } from 'fp-ts/Task'
 
-// transforms functions `B -> C` into functions `Task<B> -> Task<C>`
+// 関数 `B -> C` を、関数 `Task<B> -> Task<C>` に変換する
 const map = <B, C>(g: (b: B) => C) => (fb: Task<B>): Task<C> => () => {
   const promise = fb()
   return promise.then(g)
 }
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 interface User {
@@ -309,7 +310,7 @@ interface User {
   readonly name: string
 }
 
-// a dummy remote database
+// ダミーのリモートデータベース
 const database: Record<number, User> = {
   1: { id: 1, name: 'Ruth R. Gonzalez' },
   2: { id: 2, name: 'Terry R. Emerson' },
@@ -325,13 +326,13 @@ const getUserName = flow(getUser, map(getName))
 getUserName(1)().then(console.log) // => Ruth R. Gonzalez
 ```
 
-**Example** (`F = Reader`)
+**例** (`F = Reader`)
 
 ```ts
 import { flow } from 'fp-ts/function'
 import { Reader } from 'fp-ts/Reader'
 
-// transforms functions `B -> C` into functions `Reader<R, B> -> Reader<R, C>`
+// 関数 `B -> C` を、関数 `Reader<R, B> -> Reader<R, C>` に変換する
 const map = <B, C>(g: (b: B) => C) => <R>(fb: Reader<R, B>): Reader<R, C> => (
   r
 ) => {
@@ -340,7 +341,7 @@ const map = <B, C>(g: (b: B) => C) => <R>(fb: Reader<R, B>): Reader<R, C> => (
 }
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 interface User {
@@ -349,7 +350,7 @@ interface User {
 }
 
 interface Env {
-  // a dummy in-memory database
+  // ダミーのインメモリデータベース
   readonly database: Record<string, User>
 }
 
@@ -370,44 +371,44 @@ console.log(
 ) // => Ruth R. Gonzalez
 ```
 
-More generally, when a type constructor `F` admits a `map` function, we say it admits a **functor instance**.
+一般化すると、型コンストラクタ `F` が `map` 関数を持っている場合、それを **関手インスタンス** と呼びます。
 
-From a mathematical point of view, functors are **maps between categories** that preserve the structure of the category, meaning they preserve the identity morphisms and the composition operation.
+数学的な観点から見ると、関手は **圏間の写像** で、圏の構造を保持すると言えます。つまり、恒等射と合成演算を保持します。
 
-Since categories are pairs of objects and morphisms, a functor too is a pair of two things:
+カテゴリは対象と射のペアであるため、関手も以下の2つのもののペアです：
 
-- a **map between objects** that binds every object `X` in _C_ to an object in _D_.
-- a **map between morphisms** that binds every morphism `f` in _C_ to a morphism `map(f)` in _D_.
+- 圏 _C_ の任意の対象 `C` を、圏 _D_ 内の対象に対応付けする **対象の写像**
+- 圏 _C_ の任意の射 `f` を、圏 _D_ 内の射 `map(f)` に対応付けする **射の写像**
 
-where _C_ e _D_ are two categories (aka two programming languages).
+ここで、_C_ と _D_ は2つの圏（つまり2つのプログラミング言語）です。
 
-<img src="images/functor.png" width="500" alt="functor" />
+<img src="../../images/functor.png" width="500" alt="functor" />
 
-Even though a map between two different programming languages is a fascinating idea, we're more interested in a map where _C_ and _D_ are the same (the _TS_ category). In that case we're talking about **endofunctors** (from the greek "endo" meaning "inside", "internal").
+2つの異なるプログラミング言語間の写像というのは確かに魅力的な概念ではありますが、今私たちが問題としているのは _C_ と _D_ が同一（圏 _TS_）の場合です。つまり、**自己関手 (endofunctor)** を問題としています（"endo" はギリシャ語で「内部」の意）。
 
-From now on, unless specified differently, when we write "functor" we mean an endofunctor in the _TS_ category.
+以降、特段の指定がない限り、「関手」と書くと、圏 _TS_ における自己関手のことを指します。
 
-Now we know the practical side of functors, let's see the formal definition.
+さて、関手の実用的な側面を知りましたので、形式的な定義を見てみましょう。
 
-## Definition
+## 定義
 
-A functor is a pair `(F, map)` where:
+関手は `(F, map)` というペアで構成されます。ここで:
 
-- `F` is an `n`-ary (`n >= 1`) type constructor mapping every type `X` in a type `F<X>` (**map between objects**)
-- `map` is a function with the following signature:
+- `F` は、任意の型 `X` を型 `F<X>` に写像する `n` 項の型コンストラクタです（**対象の対応付け**）
+- `map` は、以下のシグネチャを持つ関数です：
 
 ```ts
 map: <A, B>(f: (a: A) => B) => ((fa: F<A>) => F<B>)
 ```
 
-that maps every function `f: (a: A) => B` in a function `map(f): (fa: F<A>) => F<B>` (**map between morphism**)
+`map` は、任意の関数 `f: (a: A) => B` を、関数 `map(f): (fa: F<A>) => F<B>` に対応付けます（**射の対応付け**）
 
-The following properties have to hold true:
+以下の条件を満たす必要があります：
 
-- `map(1`<sub>X</sub>`)` = `1`<sub>F(X)</sub> (**identities go to identities**)
-- `map(g ∘ f) = map(g) ∘ map(f)` (**the image of a composition is the composition of its images**)
+- `map(1`<sub>X</sub>`)` = `1`<sub>F(X)</sub> (**恒等射は恒等射に写る**)
+- `map(g ∘ f) = map(g) ∘ map(f)` (**合成の像はその像の合成である**)
 
-The second law allows to refactor and optimize the following computation:
+2つ目の条件によって、以下の処理をリファクタリング・最適化することができます：
 
 ```ts
 import { flow, increment, pipe } from 'fp-ts/function'
@@ -415,22 +416,22 @@ import { map } from 'fp-ts/ReadonlyArray'
 
 const double = (n: number): number => n * 2
 
-// iterates array twice
+// 配列を2回反復処理
 console.log(pipe([1, 2, 3], map(double), map(increment))) // => [ 3, 5, 7 ]
 
-// single iteration
+// 1回の反復処理
 console.log(pipe([1, 2, 3], map(flow(double, increment)))) // => [ 3, 5, 7 ]
 ```
 
-## Functors and functional error handling
+## 関手と関数型エラーハンドリング
 
-Functors have a positive impact on functional error handling, let's see a practical example:
+関手は、関数型エラーハンドリングによい影響を与えます。実際の例を見てみましょう：
 
 ```ts
 declare const doSomethingWithIndex: (index: number) => string
 
 export const program = (ns: ReadonlyArray<number>): string => {
-  // -1 indicates that no element has been found
+  // -1 は要素が見つからなかったことを示します
   const i = ns.findIndex((n) => n > 0)
   if (i !== -1) {
     return doSomethingWithIndex(i)
@@ -439,9 +440,9 @@ export const program = (ns: ReadonlyArray<number>): string => {
 }
 ```
 
-Using the native `findIndex` API we are forced to use an `if` branch to test whether we have a result different than `-1`. If we forget to do so, the value `-1` could be unintentionally passed as input to `doSomethingWithIndex`.
+ネイティブ API の `findIndex` を使用すると、結果が `-1` でないことを確認するために `if` 節を使用する必要があります。これを忘れると、`-1` が誤って `doSomethingWithIndex` への入力として渡される可能性があります。
 
-Let's see how easier it is to obtain the same behavior using `Option` and its functor instance:
+`Option` とその関手インスタンスなら、同じ処理をするのがいかに簡単か見てみましょう：
 
 ```ts
 import { pipe } from 'fp-ts/function'
@@ -458,19 +459,20 @@ export const program = (ns: ReadonlyArray<number>): Option<string> =>
   )
 ```
 
-Practically, using `Option`, we're always in front of the `happy path`, error handing happens behind the scenes thanks to `map`.
+実際には、`Option` を使うと、`map` のおかげでエラーハンドリングが裏で行われ、常に「ハッピー・パス（正しい実行経路）」を辿っていることが保証されるのです。
 
-**Demo** (optional)
+**デモ** (optional)
 
 [`04_functor.ts`](src/04_functor.ts)
 
-**Quiz**. `Task<A>` represents an asynchronous call that always succeed, how can we model a computation that can fail instead?
+Task<A> は常に成功する非同期呼び出しを表していますが、失敗する可能性のある計算をどのようにモデル化できますか？
+**クイズ**. `Task<A>` は常に成功する非同期呼び出しを表しています。では、失敗する可能性のある処理はどのようにモデル化したらよいでしょうか？
 
-## Functors compose
+## 関手の合成
 
-Functors compose, meaning that given two functors `F` and `G` then the composition `F<G<A>>` is still a functor and the `map` of this composition is the composition of the `map`s.
+関手は合成可能です。つまり、2つの関手 `F` と `G` が与えられた場合、合成 `F<G<A>>` もまた関手であり、この合成の `map` は `map` の合成です。
 
-**Example** (`F = Task`, `G = Option`)
+**例** (`F = Task`, `G = Option`)
 
 ```ts
 import { flow } from 'fp-ts/function'
@@ -484,7 +486,7 @@ export const map: <A, B>(
 ) => (fa: TaskOption<A>) => TaskOption<B> = flow(O.map, T.map)
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 interface User {
@@ -492,7 +494,7 @@ interface User {
   readonly name: string
 }
 
-// a dummy remote database
+// ダミーのリモートデータベース
 const database: Record<number, User> = {
   1: { id: 1, name: 'Ruth R. Gonzalez' },
   2: { id: 2, name: 'Terry R. Emerson' },
@@ -510,17 +512,17 @@ getUserName(1)().then(console.log) // => some('Ruth R. Gonzalez')
 getUserName(4)().then(console.log) // => none
 ```
 
-## Contravariant Functors
+## 反変関手
 
-In the previous section we haven't been completely thorough with our definitions. What we have seen in the previous section and called "functors" should be more properly called **covariant functors**.
+前のセクションでは、部分的に定義の厳密さを欠いていました。前のセクションの中で「関手」と呼んでいたものは、**共変関手** と呼ぶ方が適切です。
 
-In this section we'll see another variant of the functor concept, **contravariant** functors.
+このセクションでは、、それとは別の変性を持つ関手である **反変関手** を見ていきます。
 
-The definition of a contravariant functor is pretty much the same of the covariant one, except for the signature of its fundamental operation, which is called `contramap` rather than `map`.
+反変関手の定義は共変関手のそれとほとんど同じですが、その基本的な操作のシグネチャが異なり、`map` の代わりに `contramap` を使います。
 
-<img src="images/contramap.png" width="300" alt="contramap" />
+<img src="../../images/contramap.png" width="300" alt="contramap" />
 
-**Example**
+**例**
 
 ```ts
 import { map } from 'fp-ts/Option'
@@ -533,11 +535,11 @@ type User = {
 
 const getId = (_: User): number => _.id
 
-// the way `map` operates...
+// `map` 動作...
 // const getIdOption: (fa: Option<User>) => Option<number>
 const getIdOption = map(getId)
 
-// the way `contramap` operates...
+// `contramap` の動作...
 // const getIdEq: (fa: Eq<number>) => Eq<User>
 const getIdEq = contramap(getId)
 
@@ -547,7 +549,7 @@ const EqID = getIdEq(N.Eq)
 
 /*
 
-In the `Eq` chapter we saw:
+`Eq` は以前の章で見た通り:
 
 const EqID: Eq<User> = pipe(
   N.Eq,
@@ -556,11 +558,11 @@ const EqID: Eq<User> = pipe(
 */
 ```
 
-## Functors in `fp-ts`
+## `fp-ts` における関手
 
-How do we define a functor instance in `fp-ts`? Let's see some example.
+`fp-ts` において、関手インスタンスをどのように定義しましょうか。いくつか例を見ていきます。
 
-The following interface represents the model of some result we get by calling some HTTP API:
+以下のインターフェースは、HTTP API を呼び出して得られる結果のモデルを表しています。
 
 ```ts
 interface Response<A> {
@@ -571,9 +573,9 @@ interface Response<A> {
 }
 ```
 
-Please note that since `body` is parametric, this makes `Response` a good candidate to find a functor instance given that `Response` is a an `n`-ary type constructor with `n >= 1` (a necessary condition).
+`body` がパラメトリックであるため、`Response` は `Response` が `n >= 1` の `n` 項型コンストラクタであるという関手の必要条件を満たすため、関手インスタンスを見出すのに当たり、良い候補であると言えます。
 
-To define a functor instance for `Response` we need to define a `map` function along some [technical details](https://gcanti.github.io/fp-ts/recipes/HKT.html) required by `fp-ts`.
+`Response` を関手インスタンスとして定義するには、`fp-ts` が要求する [技術的な詳細](https://gcanti.github.io/fp-ts/recipes/HKT.html) に沿って、`map` 関数を定義する必要があります。
 
 ```ts
 // `Response.ts` module
@@ -601,21 +603,21 @@ export const map = <A, B>(f: (a: A) => B) => (
   body: f(fa.body)
 })
 
-// functor instance for `Response<A>`
+// `Response<A>` を関手インスタンスにする
 export const Functor: Functor1<'Response'> = {
   URI: 'Response',
   map: (fa, f) => pipe(fa, map(f))
 }
 ```
 
-## Do functors solve the general problem?
+## 関手は包括的に問題を解決できるのでしょうか？
 
-Not yet. Functors allow us to compose an effectful program `f` with a pure program `g`, but `g` has to be a **unary** function, accepting one single argument. What happens if `g` takes two or more arguments?
+まだできません。関手によって作用プログラム `f` と 純粋プログラム `g` の合成は可能になるものの、`g` は **単項** （つまり、引数が1つの）関数でなければなりません。`g` が2つ以上の引数を取る場合、どうなるのでしょうか？
 
-| Program f | Program g               | Composition  |
+| プログラム f | プログラム g               | 合成  |
 | --------- | ----------------------- | ------------ |
-| pure      | pure                    | `g ∘ f`      |
-| effectful | pure (unary)            | `map(g) ∘ f` |
-| effectful | pure (`n`-ary, `n > 1`) | ?            |
+| 純粋      | 純粋                    | `g ∘ f`      |
+| 作用 | 純粋 (単項)            | `map(g) ∘ f` |
+| 作用 | 純粋 (`n`項, `n > 1`) | ?            |
 
-To manage this circumstance we need something _more_, in the next chapter we'll see another important abstraction in functional programming: **applicative functors**.
+この状況をなんとかするには、「何か」が足りません。この「何か」とは、次の章で見る、関数型プログラミングにおけるもう1つの重要な抽象概念である **Applicative関手** です。
