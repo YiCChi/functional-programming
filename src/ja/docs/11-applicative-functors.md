@@ -21,7 +21,7 @@ g: (b: B, c: C) => D
 
 > カリー化 (currying, カリー化された=curried) とは、複数の引数をとる関数を、引数が「もとの関数の最初の引数」で戻り値が「もとの関数の残りの引数を取り結果を返す関数」であるような関数にすること（あるいはその関数のこと）である。
 
-(引用元: [currying on wikipedia.org](https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AA%E3%83%BC%E5%8C%96))
+(引用元: [カリー化 (Wikipedia)](https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AA%E3%83%BC%E5%8C%96))
 
 カリー化を用いて `g` を以下のように書き直すことができます：
 
