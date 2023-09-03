@@ -1,40 +1,40 @@
-# Monads
+# モナド
 
 <center>
-<img src="images/moggi.jpg" width="300" alt="Eugenio Moggi" />
+<img src="../../images/moggi.jpg" width="300" alt="Eugenio Moggi" />
 
-(Eugenio Moggi is a professor of computer science at the University of Genoa, Italy. He first described the general use of monads to structure programs)
+(Eugenio Moggi は、イタリア・ジェノヴァ大学の計算機科学の教授である。彼は、構造化プログラミングにおいて広くモナドを用いることを提言した最初の人物である)
 
-<img src="images/wadler.jpg" width="300" alt="Philip Lee Wadler" />
+<img src="../../images/wadler.jpg" width="300" alt="Philip Lee Wadler" />
 
-(Philip Lee Wadler is an American computer scientist known for his contributions to programming language design and type theory)
+(Philip Lee Wadler はアメリカの計算機科学者であり、プログラミング言語や型理論における功績で知られている)
 
 </center>
 
-In the last chapter we have seen how we can compose an effectful program `f: (a: A) => F<B>` with an `n`-ary pure program `g`, if and only if the type constructor `F` admits an applicative functor instance:
+前章では、`F` がアプリカティブ関手インスタンスであるならば、作用プログラム `f: (a: A) => F<B>` と、`n` 項の純粋プログラム `g` を合成できるということを見てきました：
 
-| Program f | Program g     | Composition     |
+| プログラム f | プログラム g     | 合成     |
 | --------- | ------------- | --------------- |
-| pure      | pure          | `g ∘ f`         |
-| effectful | pure (unary)  | `map(g) ∘ f`    |
-| effectful | pure, `n`-ary | `liftAn(g) ∘ f` |
+| 純粋      | 純粋          | `g ∘ f`         |
+| 作用 | 純粋 (単項)  | `map(g) ∘ f`    |
+| 作用 | 純粋, `n` 項 | `liftAn(g) ∘ f` |
 
-But we need to solve one last, quite common, case: when **both** programs are effectful:
+最後に、非常に一般的なケースである、**両方とも** 作用プログラムである場合を解決しなければなりません：
 
 ```ts
 f: (a: A) => F<B>
 g: (b: B) => F<C>
 ```
 
-What is the composition of `f` and `g`?
+`f` と `g` の合成はどうなるのでしょうか？
 
-## The problem with nested contexts
+## 入れ子問題
 
-Let's see few examples on why we need something more.
+どういった状況が未解決に当たるのか、例を見ておきます。
 
-**Example** (`F = Array`)
+**例** (`F = Array`)
 
-Suppose we want to get followers' followers.
+フォロワーのフォロワーを取得したい場合を考えます。
 
 ```ts
 import { pipe } from 'fp-ts/function'
@@ -54,9 +54,9 @@ declare const user: User
 const followersOfFollowers = pipe(user, getFollowers, A.map(getFollowers))
 ```
 
-There's something wrong here, `followersOfFollowers` has a type `ReadonlyArray<ReadonlyArray<User>>` but we want `ReadonlyArray<User>`.
+これはちょっとおかしなことになっています。`followersOfFollowers` の型は `ReadonlyArray<ReadonlyArray<User>>` ですが、本来は `ReadonlyArray<User>` であって欲しいところです。
 
-We need to **flatten** nested arrays.
+入れ子になった配列を **平坦化** する必要があります。
 
 The function `flatten: <A>(mma: ReadonlyArray<ReadonlyArray<A>>) => ReadonlyArray<A>` exported by the `fp-ts/ReadonlyArray` is exactly what we need:
 
@@ -70,11 +70,10 @@ const followersOfFollowers = pipe(
 )
 ```
 
-Cool! Let's see some other data type.
+いいですね！ 他の型も見てみましょう。
 
-**Example** (`F = Option`)
-Suppose you want to calculate the reciprocal of the first element of a numerical array:
-
+**例** (`F = Option`)
+数列の最初の要素の逆数を求めたい場合を考えます。
 ```ts
 import { pipe } from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -87,70 +86,69 @@ const inverse = (n: number): O.Option<number> =>
 const inverseHead = pipe([1, 2, 3], A.head, O.map(inverse))
 ```
 
-Oops, it happened again, `inverseHead` has type `Option<Option<number>>` but we want `Option<number>`.
+おっと、またです。`inverseHead` の型は `Option<Option<number>>` ですが、`Option<number>` であって欲しいです。
 
-We need to flatten again the nested `Option`s.
+入れ子になった `Option` をまた平坦化する必要があります。
 
-The `flatten: <A>(mma: Option<Option<A>>) => Option<A>` function exported by the `fp-ts/Option` module is what we need:
+`fp-ts/Option` モジュールが expose している関数 `flatten: <A>(mma: Option<Option<A>>) => Option<A>` が使えます：
 
 ```ts
 // inverseHead: O.Option<number>
 const inverseHead = pipe([1, 2, 3], A.head, O.map(inverse), O.flatten)
 ```
 
-All of those `flatten` funcitons...They aren't a coincidence, there is a functional pattern behind the scenes: both the type constructors
-`ReadonlyArray` and `Option` (and many others) admit a **monad instance** and
+このような関数 `flatten` は偶然現れた訳ではありません。背後に、関数型のパターンが存在します。型コンストラクタ `ReadonlyArray` と `Option` （他にも多くありますが）は、**モナドインスタンス** であり、
 
-> `flatten` is the most peculiar operation of monads
+> `flatten` はモナドの最も特徴的な操作です。
 
-**Note**. A common synonym of `flatten` is **join**.
+**注意**. `flatten` は一般的に **join** とも呼ばれます。
 
-So, what is a monad?
+では、モナドとは何なのでしょうか？
 
-Here is how they are often presented...
+以下、よくあるな説明を示します……
 
-## Monad Definition
+## モナドの定義
 
-**Definition**. A monad is defined by three things:
+**定義**. モナドは3つの制約があります：
 
-(1) a type constructor `M` admitting a functor instance
+(1) 型コンストラクタ `M` は関手インスタンスであること
 
-(2) a function `of` (also called **pure** or **return**) with the following signature:
+(2) 以下のシグネチャを持つ関数 `of` (**pure** や **return** とも呼ばれる) が定義されていること:
 
 ```ts
 of: <A>(a: A) => M<A>
 ```
 
-(3) a `chain` function (also called **flatMap** or **bind**) with the following signature:
+(3) 以下のシグネチャを持つ関数 `chain` (**flatMap** や **bind** とも呼ばれる) が定義されていること:
 
 ```ts
 chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 ```
 
-The `of` and `chain` functions need to obey three laws:
+関数 `of` と `chain` は以下の制約を満たす必要があります：
 
-- `chain(of) ∘ f = f` (**Left identity**)
-- `chain(f) ∘ of = f` (**Right identity**)
-- `chain(h) ∘ (chain(g) ∘ f) = chain((chain(h) ∘ g)) ∘ f` (**Associativity**)
+- `chain(of) ∘ f = f` (**左単位元**)
+- `chain(f) ∘ of = f` (**右単位元**)
+- `chain(h) ∘ (chain(g) ∘ f) = chain((chain(h) ∘ g)) ∘ f` (**結合律**)
 
-where `f`, `g`, `h` are all effectful functions and `∘` is the usual function composition.
+ただし、`f` `g` `h` はすべて作用プログラムであって、`*` は普通の関数合成を表します。
 
-When I saw this definition for the first time I had many questions:
+私が初めてこの定義を見たとき、多くの疑問が浮かびました：
 
-- why exactly those two operation `of` and `chain`? and why to they have those signatures?
-- why do they have those synonyms like "pure" or "flatMap"?
-- why does laws need to hold true? What do they mean?
-- if `flatten` is so important for monads, why it doesn't compare in its definition?
+- なぜ必要とされるのは他でもない `of` と `chain` なのか？ そして、なぜこれらはこういったシグネチャを持たねばならないのか？
+- なぜ "pure" や "flatMap" のような同義語が存在するのか？
+- なぜこうした制約が課されているのか？ これらは何を意味しているのか？
+- `flatten` はモナドにとって重要であるのに、なぜその定義の中に現れないのか？
 
-This chapter will try to answer all of these questions.
+この章では、これらの問いすべてに対する答えを探していきます。
 
-Let's get back to the core problem: what is the composition of two effectful functions `f` and `g`?
+話を元の問いに戻しましょう： 2つの作用関数 `f` `g` はどうやって合成するのでしょうか？
 
-<img src="images/kleisli_arrows.png" alt="two Kleisli arrows, what's their composition?" width="450px" />
+<img src="../../images/kleisli_arrows.png" alt="two Kleisli arrows, what's their composition?" width="450px" />
 
 <center>(two Kleisli Arrows)</center>
 
-**Note**. An effectful function is also called **Kleisli arrow**.
+**注意**. 作用関数は **Kleisli arrow** とも呼ばれます。
 
 For the time being I don't even know the **type** of such composition.
 
