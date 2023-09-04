@@ -200,7 +200,7 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 
 - `f: (a: A) => B` と `g: (b: B) => C` を合成するには、通常の関数合成を使用します
 - `f: (a: A) => F<B>` と `g: (b: B) => C` を合成するには、`F` の **関手** インスタンスが必要です
-- `f: (a: A) => F<B>` と `g: (b: B, c: C) => D` を合成するには、`F` の **Applicative 関手** インスタンスが必要です
+- `f: (a: A) => F<B>` と `g: (b: B, c: C) => D` を合成するには、`F` の **アプリカティブ関手** インスタンスが必要です
 - `f: (a: A) => F<B>` と `g: (b: B) => F<C>` を合成するには、`F` の **モナド** インスタンスが必要です
 
 <img src="../../images/spoiler.png" width="900" alt="The four composition recipes" />
