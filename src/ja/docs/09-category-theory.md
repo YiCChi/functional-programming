@@ -35,7 +35,7 @@ const double = (n: number): number => n * 2
 const program = (input: ReadonlyArray<number>): number =>
   pipe(
     input,
-    RA.head, // compilation error! Type 'Option<number>' is not assignable to type 'number'
+    RA.head, // コンパイルエラー！ 型 'Option<number>' は型 'number' に変換できません。
     double
   )
 ```
