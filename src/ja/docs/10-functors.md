@@ -576,7 +576,7 @@ interface Response<A> {
 
 `body` がパラメトリックであるため、`Response` は `Response` が `n >= 1` の `n` 項型コンストラクタであるという関手の必要条件を満たすため、関手インスタンスを見出すのに当たり、良い候補であると言えます。
 
-`Response` を関手インスタンスとして定義するには、`fp-ts` が要求する [技術的な詳細](https://gcanti.github.io/fp-ts/recipes/HKT.html) に沿って、`map` 関数を定義する必要があります。
+`Response` を関手インスタンスとして定義するには、`fp-ts` が要求する [技術的な詳細](https://gcanti.github.io/fp-ts/#higher-kinded-types) に沿って、`map` 関数を定義する必要があります。
 
 ```ts
 // `Response.ts` module
