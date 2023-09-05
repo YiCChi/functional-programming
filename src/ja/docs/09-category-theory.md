@@ -174,7 +174,7 @@ const gf = (s: string): boolean => g(f(s))
 
 - **対象** は TypeScript に存在しうるすべての型です: `string`, `number`, `ReadonlyArray<string>`, など。
 - **射** は TypeScript のすべての関数です: `(a: A) => B`, `(b: B) => C`, など。ここで `A`, `B`, `C`, などは TypeScript の型です。
-- **恒等射** はすべて、1つの多層的関数に集約されています。 `const identity = <A>(a: A): A => a`
+- **恒等射** はすべて、1つの多相的関数に集約されています。 `const identity = <A>(a: A): A => a`
 - **射の合成** は通常の関数合成です (これは結合法則を満たすことが知られています)。
 
 TypeScriptのモデルとして、圏 _TS_ はやや制約があるように見えるかもしれません。ループもなく、`if` もありません。ほとんど何もありません…… ですが、この簡略モデルは、目標である well-defined な合成の概念について考えるのに十分です。
