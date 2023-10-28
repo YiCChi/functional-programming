@@ -146,108 +146,106 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 
 <img src="../../images/kleisli_arrows.png" alt="two Kleisli arrows, what's their composition?" width="450px" />
 
-<center>(two Kleisli Arrows)</center>
+<center>(2つのクライスリ射)</center>
 
-**注意**. 作用関数は **Kleisli arrow** とも呼ばれます。
+**注意**. 作用関数は **クライスリ射** とも呼ばれます。
 
-For the time being I don't even know the **type** of such composition.
+現時点では、そのような合成の型すらわかりません。
 
-But we've already seen some abstractions that talks specifically about composition. Do you remember what we said about categories?
+しかし、合成について具体的に示す抽象化をここまで見てきました。圏について述べたことを覚えていますか？
 
-> Categories capture the essence of composition
+> 圏は合成の本質を捉えています
 
-We can transform our problem into a category problem, meaning: can we find a category that models the composition of Kleisli arrows?
+私たちの問題を次のような圏の問題に変換できます： クライスリ射の合成をモデル化する県を見つけることができるでしょうか？
 
-## The Kleisli category
+## クライスリ圏
 
 <center>
-<img src="images/kleisli.jpg" width="300" alt="Heinrich Kleisli" />
+<img src="../../images/kleisli.jpg" width="300" alt="Heinrich Kleisli" />
 
-(Heinrich Kleisli, Swiss mathematician)
+(スイスの数学者、Heinrich Kleisli)
 
 </center>
 
-Let's try building a category _K_ (called **Kleisli category**) which contains _only_ Kleisli arrows:
+クライスリ射のみを含む圏 **K**（クライスリ圏と呼ばれます）を構築してみましょう：
 
-- **objects** will be the same objects of the _TS_ category, so all TypeScript types.
-- **morphisms** are built like this: every time there is a Kleisli arrow `f: A ⟼ M<B>` in _TS_ we draw an arrow `f': A ⟼ B` in _K_
-
+- **対象** ： 圏 **TS** の対象と同じであり、TypeScriptのすべての型です。
+- **射** : **TS** にクライスリ射 `f: A ⟼ M<B>` が存在する場合、**K** に射 `f': A ⟼ B` にも射を描きます。
 <center>
-<img src="images/kleisli_category.png" alt="above the TS category, below the K construction" width="400px" />
-
-(above the composition in the _TS_ category, below the composition in the _K_ construction)
+<img src="../../images/kleisli_category.png" alt="above the TS category, below the K construction" width="400px" />
 
 </center>
 
-So what would be the composition of `f` and `g` in _K_?
-It's th red arrow called `h'` in the image below:
+では、 **K** における `f` と `g` の合成はどうなるのでしょうか？ 下図の `h'` と名付けられた赤い射がこれに該当します。
 
 <center>
 <img src="images/kleisli_composition.png" alt="above the composition in the TS category, below the composition in the K construction" width="400px" />
 
-(above the composition in the _TS_ category, below the composition in the _K_ construction)
+（上は圏 **TS** 内の合成で、下は **K** 内の合成です）
 
 </center>
 
-Given that `h'` is an arrow from `A` to `C` in `K`, we can find a corresponding function `h` from `A` to `M<C>` in `TS`.
+`h'` が **K** 内における `A` から `C` への射であるとすると、これに対応する **TS** 内の `A` から `M<C>` 関数 `h` を見出すことができます。
 
-Thus, a good candidate for the following composition of `f` and `g` in _TS_ is still a Kleisli arrow with the following signature: `(a: A) => M<C>`.
+したがって、**TS** での `f` と `g` の合成の候補として良いのは、次のシグネチャを持つクライスリ射です： `(a: A) => M<C>。`
 
-Let's try implementing such a function.
+そのような関数を実装してみましょう。
 
-## Defining `chain` step by step
+## `chain` を段階的に定義する
 
-The first point (1) of the monad definition tells us that `M` admits a functor instance, thus we can use the `map` function to transform the function `g: (b: B) => M<C>` into a function `map(g): (mb: M<B>) => M<M<C>>`
+モナドの定義の第1の制約（1）によれば、`M` は関手インスタンスでなければならないということです。したがって、関数 `g: (b: B) => M<C>` を関数 `map(g): (mb: M<B>) => M<M<C>>` に変換するために `map` 関数を使用できます。
 
 <center>
-<img src="images/flatMap.png" alt="where chain comes from" width="450px" />
+<img src="../../images/flatMap.png" alt="where chain comes from" width="450px" />
 
-(how to obtain the `h` function)
+(どのようにして関数 `h` を得るのか)
 
 </center>
 
-We're stuck now though: there is no legal operation for the functor instance that allows us to flatten a value of type `M<M<C>>` into a value of type `M<C>`, we need an additional operation, let's call it `flatten`.
+ここで立ち往生しています。型 `M<M<C>>` の値を型 `M<C>` の値に平坦化できる合法的な操作は存在しません。他の演算子が必要です。これを `flatten` と呼ぶことにします。
 
-If we can define such operation then we can find the composition we were looking for:
+以下のような操作を定義できれば、求めていた合成が見つかります：
 
 ```
 h = flatten ∘ map(g) ∘ f
 ```
 
-By joining the `flatten ∘ map(g)` names we get "flatMap", hence the name!
+`flatten ∘ map(g)` の名前を組み合わせると "flatMap" となり、その名前が生まれます！
 
-Thus we can get `chain` in this way
+したがって、以下のような形で `chain` を得ました。
 
 ```
 chain = flatten ∘ map(g)
 ```
 
 <center>
-<img src="images/chain.png" alt="how chain operates on the function g" width="400px" />
+<img src="../../images/chain.png" alt="how chain operates on the function g" width="400px" />
 
-(how `chain` operates on the function `g`)
+(`chain` が関数 `g` に対して行う操作)
 
 </center>
 
-Now we can update our composition table
+合成表を更新しましょう。
 
-| Program f | Program g     | Composition     |
+| プログラム f | プログラム g | 合成          |
 | --------- | ------------- | --------------- |
-| pure      | pure          | `g ∘ f`         |
-| effectful | pure (unary)  | `map(g) ∘ f`    |
-| effectful | pure, `n`-ary | `liftAn(g) ∘ f` |
-| effectful | effectful     | `chain(g) ∘ f`  |
+| 純粋      | 純粋          | `g ∘ f`         |
+| 作用      | 純粋 (単項 )  | `map(g) ∘ f`    |
+| 作用      | 純粋, `n` 項  | `liftAn(g) ∘ f` |
+| 作用      | 作用          | `chain(g) ∘ f`  |
 
-What about `of`? Well, `of` comes from the identity morphisms in _K_: for every identity morphism 1<sub>A</sub> in _K_ there has to be a corresponding function from `A` to `M<A>` (that is, `of: <A>(a: A) => M<A>`).
+`of` についてはどうでしょうか？ `of` は **K** 内の恒等射から生み出されます。つまり、**K** 内のすべての恒等射 1<sub>A</> に対して、 `A` から `M<A>` への対応付けをする関数がなければなりません。
 
 <center>
-<img src="images/of.png" alt="where of comes from" width="300px" />
+<img src="../../images/of.png" alt="where of comes from" width="300px" />
 
-(where `of` comes from)
+(どこから `of` が生み出されるのか)
 
 </center>
 
-The fact that `of` is the neutral element for `chain` allows this kind of flux control (pretty common):
+// TODO: neutral 訳す
+// TODO: flux control 調べて直す
+`of` が `chain` の neutral 要素であることから、以下のようなフラックス制御（非常に一般的）が可能になります：
 
 ```ts
 pipe(
@@ -256,17 +254,17 @@ pipe(
 )
 ```
 
-where `predicate: (b: B) => boolean`, `mb: M<B>` and `g: (b: B) => M<B>`.
+ただし、`predicate: (b: B) => boolean`、`mb: M<B>`、`g: (b: B) => M<B>` です。
 
-Last question: where do the laws come from? They are nothing else but the categorical laws in _K_ translated to _TS_:
+最後の質問です： 法則はどこから来るのでしょうか？ それらは、**K** における圏論的制約の **TS** への変換そのものです：
 
-| Law            | _K_                               | _TS_                                                    |
+| 法則           | **K**                             | **TS**                                                  |
 | -------------- | --------------------------------- | ------------------------------------------------------- |
-| Left identity  | 1<sub>B</sub> ∘ `f'` = `f'`       | `chain(of) ∘ f = f`                                     |
-| Right identity | `f'` ∘ 1<sub>A</sub> = `f'`       | `chain(f) ∘ of = f`                                     |
-| Associativity  | `h' ∘ (g' ∘ f') = (h' ∘ g') ∘ f'` | `chain(h) ∘ (chain(g) ∘ f) = chain((chain(h) ∘ g)) ∘ f` |
+| 左単位元       | 1<sub>B</sub> ∘ `f'` = `f'`       | `chain(of) ∘ f = f`                                     |
+| 右単位元       | `f'` ∘ 1<sub>A</sub> = `f'`       | `chain(f) ∘ of = f`                                     |
+| 結合法則       | `h' ∘ (g' ∘ f') = (h' ∘ g') ∘ f'` | `chain(h) ∘ (chain(g) ∘ f) = chain((chain(h) ∘ g)) ∘ f` |
 
-If we now go back to the examples that showed the problem with nested contexts we can solve them using `chain`:
+入れ子になった話題を抜けて元の問題に戻すと、`chain` を使ってそれらを解決できます：
 
 ```ts
 import { pipe } from 'fp-ts/function'
@@ -295,12 +293,12 @@ const inverse = (n: number): O.Option<number> =>
 const inverseHead: O.Option<number> = pipe([1, 2, 3], A.head, O.chain(inverse))
 ```
 
-Let's see how `chain` is implemented for the usual type constructors we've already seen:
+それでは、既に見てきた通常の型コンストラクタに対して、`chain` がどのように実装されるか見てみましょう：
 
-**Example** (`F = ReadonlyArray`)
+**例** (`F = ReadonlyArray`)
 
 ```ts
-// transforms functions `B -> ReadonlyArray<C>` into functions `ReadonlyArray<B> -> ReadonlyArray<C>`
+// 関数 `B -> ReadonlyArray<C>` を関数 `ReadonlyArray<B> -> ReadonlyArray<C>` に変換する
 const chain = <B, C>(g: (b: B) => ReadonlyArray<C>) => (
   mb: ReadonlyArray<B>
 ): ReadonlyArray<C> => {
@@ -312,52 +310,52 @@ const chain = <B, C>(g: (b: B) => ReadonlyArray<C>) => (
 }
 ```
 
-**Example** (`F = Option`)
+**例** (`F = Option`)
 
 ```ts
 import { match, none, Option } from 'fp-ts/Option'
 
-// transforms functions `B -> Option<C>` into functions `Option<B> -> Option<C>`
+// 関数 `B -> Option<C>` を関数 `Option<B> -> Option<C>` に変換する
 const chain = <B, C>(g: (b: B) => Option<C>): ((mb: Option<B>) => Option<C>) =>
   match(() => none, g)
 ```
 
-**Example** (`F = IO`)
+**例** (`F = IO`)
 
 ```ts
 import { IO } from 'fp-ts/IO'
 
-// transforms functions `B -> IO<C>` into functions `IO<B> -> IO<C>`
+// 関数 `B -> IO<C>` を関数 `IO<B> -> IO<C>` に変換する
 const chain = <B, C>(g: (b: B) => IO<C>) => (mb: IO<B>): IO<C> => () =>
   g(mb())()
 ```
 
-**Example** (`F = Task`)
+**例** (`F = Task`)
 
 ```ts
 import { Task } from 'fp-ts/Task'
 
-// transforms functions `B -> Task<C>` into functions `Task<B> -> Task<C>`
+// 関数 `B -> Task<C>` を関数 `Task<B> -> Task<C>` に変換する
 const chain = <B, C>(g: (b: B) => Task<C>) => (mb: Task<B>): Task<C> => () =>
   mb().then((b) => g(b)())
 ```
 
-**Example** (`F = Reader`)
+**例** (`F = Reader`)
 
 ```ts
 import { Reader } from 'fp-ts/Reader'
 
-// transforms functions `B -> Reader<R, C>` into functions `Reader<R, B> -> Reader<R, C>`
+// 関数 `B -> Reader<R, C>` を関数 `Reader<R, B> -> Reader<R, C>` に変換する
 const chain = <B, R, C>(g: (b: B) => Reader<R, C>) => (
   mb: Reader<R, B>
 ): Reader<R, C> => (r) => g(mb(r))(r)
 ```
 
-## Manipulating programs
+## プログラムの操作
 
-Let's see now, how thanks to referential transparency and the monad concept we can programmaticaly manipulate programs.
+さて、参照透過性とモナド概念によって、プログラムをプログラムで操作できる例を見てみます。
 
-Here's a small program that reads / writes a file:
+以下は、ファイルの読み取りと書き込みを行う簡単なプログラムです。
 
 ```ts
 import { log } from 'fp-ts/Console'
@@ -366,7 +364,7 @@ import { pipe } from 'fp-ts/function'
 import * as fs from 'fs'
 
 // -----------------------------------------
-// library functions
+// ライブラリ関数
 // -----------------------------------------
 
 const readFile = (filename: string): IO<string> => () =>
@@ -375,7 +373,7 @@ const readFile = (filename: string): IO<string> => () =>
 const writeFile = (filename: string, data: string): IO<void> => () =>
   fs.writeFileSync(filename, data, { encoding: 'utf-8' })
 
-// API derived from the previous functions
+// 上の関数に由来する API
 const modifyFile = (filename: string, f: (s: string) => string): IO<void> =>
   pipe(
     readFile(filename),
@@ -383,7 +381,7 @@ const modifyFile = (filename: string, f: (s: string) => string): IO<void> =>
   )
 
 // -----------------------------------------
-// program
+// プログラム
 // -----------------------------------------
 
 const program1 = pipe(
@@ -395,13 +393,13 @@ const program1 = pipe(
 )
 ```
 
-The actions:
+このプログラム内では、
 
 ```ts
 pipe(readFile('file.txt'), chain(log))
 ```
 
-is repeated more than once in the program, but given that referential transparency holds we can factor it and assign it to a constant:
+という操作が複数回繰り返されますが、参照透明性が成り立つため、それをまとめて定数に代入しておくことができます。
 
 ```ts
 const read = pipe(readFile('file.txt'), chain(log))
@@ -414,7 +412,7 @@ const program2 = pipe(
 )
 ```
 
-We can even define a combinator and leverage it to make the code more compact:
+さらに、コンビネータを定義し、コードをよりコンパクトにするために活用できます：
 
 ```ts
 const interleave = <A, B>(action: IO<A>, middle: IO<B>): IO<A> =>
@@ -427,7 +425,7 @@ const interleave = <A, B>(action: IO<A>, middle: IO<B>): IO<A> =>
 const program3 = interleave(read, modify)
 ```
 
-Another example: implementing a function similar to Unix' `time` (the part related to the execution time) for `IO`.
+別の例を挙げます： Unix の `time` に似た `IO` 用の機能を実装してみましょう（実行時間に関連する部分）。
 
 ```ts
 import * as IO from 'fp-ts/IO'
@@ -435,7 +433,7 @@ import { now } from 'fp-ts/Date'
 import { log } from 'fp-ts/Console'
 import { pipe } from 'fp-ts/function'
 
-// logs the computation lenght in milliseconds
+// ミリ秒単位で実行時間のログを取る
 export const time = <A>(ma: IO.IO<A>): IO.IO<A> =>
   pipe(
     now,
@@ -458,10 +456,9 @@ export const time = <A>(ma: IO.IO<A>): IO.IO<A> =>
   )
 ```
 
-**Digression**. As you can notice, using `chain` when it is required to maintain a scope leads to verbose code.
-In languages that support monadic style natively there is often syntax support that goes by the name of "do notation" which eases this kind of situations.
+**余談** お気づきの通り、スコープを維持する必要がある場合に `chain` を使用すると冗長なコードになります。モナドスタイルをネイティブでサポートする言語では、この種の状況を簡素化する "do 記法" と呼ばれる構文サポートがあることが多いです。
 
-Let's see a Haskell example
+例として Haskell を見てみましょう
 
 ```haskell
 now :: IO Int
@@ -479,7 +476,7 @@ time ma = do
   return a
 ```
 
-TypeScript does not support such syntax, but it can be emulated with something similar:
+TypeScript はこのような構文をサポートしていませんが、似たようなものを模倣することはできます：
 
 ```ts
 import { log } from 'fp-ts/Console'
@@ -487,7 +484,7 @@ import { now } from 'fp-ts/Date'
 import { pipe } from 'fp-ts/function'
 import * as IO from 'fp-ts/IO'
 
-// logs the computation lenght in milliseconds
+// ミリ秒単位で実行時間のログを取る
 export const time = <A>(ma: IO.IO<A>): IO.IO<A> =>
   pipe(
     IO.Do,
@@ -501,7 +498,7 @@ export const time = <A>(ma: IO.IO<A>): IO.IO<A> =>
   )
 ```
 
-Let's see a usage example of the `time` combinator:
+`time` コンビネータの使用例を見てみましょう：
 
 ```ts
 import { randomInt } from 'fp-ts/Random'
@@ -510,14 +507,15 @@ import { replicate } from 'fp-ts/ReadonlyArray'
 
 const fib = (n: number): number => (n <= 1 ? 1 : fib(n - 1) + fib(n - 2))
 
-// launches `fib` with a random integer between 30 and 35
-// logging both the input and output
+
+// `fib` を30 から 35 までのランダムな整数で実行する
+// 入力・出力の両方をログに取る
 const randomFib: IO.IO<void> = pipe(
   randomInt(30, 35),
   IO.chain((n) => log([n, fib(n)]))
 )
 
-// a monoid instance for `IO<void>`
+// `IO<void>` のモナドインスタンス
 const MonoidIO: Monoid<IO.IO<void>> = {
   concat: (first, second) => () => {
     first()
@@ -526,12 +524,12 @@ const MonoidIO: Monoid<IO.IO<void>> = {
   empty: IO.of(undefined)
 }
 
-// executes `n` times the `mv` computation
+// `n` 回 `mv` 操作を実行する
 const replicateIO = (n: number, mv: IO.IO<void>): IO.IO<void> =>
   concatAll(MonoidIO)(replicate(n, mv))
 
 // -------------------
-// usage example
+// 使用例
 // -------------------
 
 time(replicateIO(3, randomFib))()
@@ -543,7 +541,7 @@ Elapsed: 89
 */
 ```
 
-Logs also the partial:
+一部分に関するログを取ることもできます：
 
 ```ts
 time(replicateIO(3, time(randomFib)))()
@@ -558,16 +556,16 @@ Elapsed: 106
 */
 ```
 
-One of the most interesting aspects of working with the monadic interface (`map`, `of`, `chain`) is the possibility to inject dependencies which the program needs, including the **way of concatenating different computations**.
+モナドインターフェース (`map`、`of`、`chain`) を用いる際に最も面白い側面の一つは、プログラムが必要とする依存関係と **異なる計算を連結する方法** を注入できる点です。
 
-To see that, let's refactor the small program that reads and writes a file:
+これを確認するために、ファイルの読み書きをする簡単なプログラムをリファクタリングしてみましょう：
 
 ```ts
 import { IO } from 'fp-ts/IO'
 import { pipe } from 'fp-ts/function'
 
 // -----------------------------------------
-// Deps interface, what we would call a "port" in the Hexagonal Architecture
+// Deps インターフェース。 ヘキサゴナルアーキテクチャにおいて「ポート」と呼ばれるものです。
 // -----------------------------------------
 
 interface Deps {
@@ -578,7 +576,7 @@ interface Deps {
 }
 
 // -----------------------------------------
-// program
+// プログラム
 // -----------------------------------------
 
 const program4 = (D: Deps) => {
@@ -598,7 +596,7 @@ const program4 = (D: Deps) => {
 }
 
 // -----------------------------------------
-// a `Deps` instance, what we would call an "adapter" in the Hexagonal Architecture
+// `Deps` インスタンス。 ヘキサゴナルアーキテクチャにおいて「アダプタ」と呼ばれるものです。
 // -----------------------------------------
 
 import * as fs from 'fs'
@@ -613,24 +611,24 @@ const DepsSync: Deps = {
   chain
 }
 
-// dependency injection
+// 依存関係の注入
 program4(DepsSync)()
 ```
 
-There's more, we can even abstract the effect in which the program runs. We can define our own `FileSystem` effect (the effect representing read-write operations over the file system):
+さらに、プログラムの実行によって発生する作用を抽象化することもできます。独自の `FileSystem` 作用（ファイルシステム上の読み書き操作を表す作用）を定義できます。
 
 ```ts
 import { IO } from 'fp-ts/IO'
 import { pipe } from 'fp-ts/function'
 
 // -----------------------------------------
-// our program's effect
+// プログラムの作用
 // -----------------------------------------
 
 interface FileSystem<A> extends IO<A> {}
 
 // -----------------------------------------
-// dependencies
+// 依存関係
 // -----------------------------------------
 
 interface Deps {
@@ -643,7 +641,7 @@ interface Deps {
 }
 
 // -----------------------------------------
-// program
+// プログラム
 // -----------------------------------------
 
 const program4 = (D: Deps) => {
@@ -663,31 +661,31 @@ const program4 = (D: Deps) => {
 }
 ```
 
-With a simple change in the definition of the `FileSystem` effect. we can modify the program to make it run asynchronously
+`FileSystem` 作用の定義を少し変更するだけで、プログラムを非同期に実行するように変更できます。
 
 ```diff
 // -----------------------------------------
-// our program's effect
+// プログラムの作用
 // -----------------------------------------
 
 -interface FileSystem<A> extends IO<A> {}
 +interface FileSystem<A> extends Task<A> {}
 ```
 
-now all there's left is to modify the `Deps` instance to adapt to the new definition.
+あとは、`Deps` インスタンスを新しい定義に合わせて修正することだけです。
 
 ```ts
 import { Task } from 'fp-ts/Task'
 import { pipe } from 'fp-ts/function'
 
 // -----------------------------------------
-// our program's effect (modified)
+// プログラムの作用 (変更後)
 // -----------------------------------------
 
 interface FileSystem<A> extends Task<A> {}
 
 // -----------------------------------------
-// dependencies (NOT modified)
+// 依存関係 (変更無し)
 // -----------------------------------------
 
 interface Deps {
@@ -700,7 +698,7 @@ interface Deps {
 }
 
 // -----------------------------------------
-// program (NOT modified)
+// プログラム (変更無し)
 // -----------------------------------------
 
 const program5 = (D: Deps) => {
@@ -720,7 +718,7 @@ const program5 = (D: Deps) => {
 }
 
 // -----------------------------------------
-// a `Deps` instance (modified)
+// `Deps` インスタンス (変更後)
 // -----------------------------------------
 
 import * as fs from 'fs'
@@ -738,11 +736,11 @@ const DepsAsync: Deps = {
   chain
 }
 
-// dependency injection
+// 依存関係の注入
 program5(DepsAsync)()
 ```
 
-**Quiz**. The previous examples overlook, on purpose, possible errors. Example give: the file we're operating on may not exist at all. How could we modify the `FileSystem` effect to take this into account?
+**クイズ** 上記の例では、わざと潜在的なエラーを見逃しています。例えば、操作しようとしたファイルが存在しない可能性があります。`FileSystem` 作用を修正して、これを考慮するにはどうすればよいでしょうか？
 
 ```ts
 import { Task } from 'fp-ts/Task'
@@ -750,13 +748,13 @@ import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 
 // -----------------------------------------
-// our program's effect (modified)
+// プログラムの作用 (変更後)
 // -----------------------------------------
 
 interface FileSystem<A> extends Task<E.Either<Error, A>> {}
 
 // -----------------------------------------
-// dependencies (NOT modified)
+// 依存関係 (変更無し)
 // -----------------------------------------
 
 interface Deps {
@@ -769,7 +767,7 @@ interface Deps {
 }
 
 // -----------------------------------------
-// program (NOT modified)
+// プログラム (変更無し)
 // -----------------------------------------
 
 const program5 = (D: Deps) => {
@@ -789,7 +787,7 @@ const program5 = (D: Deps) => {
 }
 
 // -----------------------------------------
-// `Deps` instance (modified)
+// `Deps` インスタンス (変更後)
 // -----------------------------------------
 
 import * as fs from 'fs'
@@ -821,10 +819,10 @@ const DepsAsync: Deps = {
   chain
 }
 
-// dependency injection
+// 依存関係の注入
 program5(DepsAsync)().then(console.log)
 ```
 
 **Demo**
 
-[`06_game.ts`](src/06_game.ts)
+[`06_game.ts`](../06_game.ts)
