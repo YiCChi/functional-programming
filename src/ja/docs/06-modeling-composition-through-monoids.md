@@ -1,35 +1,35 @@
 # モノイドで合成をモデリングする
 
-Let's recap what we have seen till now.
+これまで見てきた内容をまとめてみましょう。
 
-We have seen how an **algebra** is a combination of:
+**代数** が以下の要素の組み合わせであることを見てきました：
 
-- some type `A`
-- some operations involving the type `A`
-- some laws and properties for that combination.
+- ある型 `A`
+- 型 `A` に関わるいくつかの演算
+- いくつかの法則とそれらを組み合わせた性質
 
-The first algebra we have seen has been the magma, an algebra defined on some type A equipped with one operation called `concat`. There were no laws involved in `Magma<A>` the only requirement we had was that the `concat` operation had to be _closed_ on `A` meaning that the result:
+最初に見た代数はマグマであり、ある型 `A` 上に定義され、`concat` と呼ばれる1つの演算を持っていました。`Magma<A>` に関連する法則は存在せず、唯一の要件は `concat` 演算が `A` 上で **閉じている** ことでした。つまり、以下のように：
 
 ```ts
 concat(first: A, second: A) => A
 ```
 
-has still to be an element of the `A` type.
+演算の結果もまた型 `A` の元でなければなりません。
 
-Later on we have seen how adding one simple requirement, _associativity_, allowed some `Magma<A>` to be further refined as a `Semigroup<A>`, and how associativity captures the possibility of computations to be parallelized.
+その後、1つの単純な条件、**結合法則** を追加することで、任意の `Magma<A>` が `Semigroup<A>` としてさらに洗練されることや、結合法則によって計算の並列可能性が担保されることを見ました。
 
-Now we're going to add another condition on Semigroup.
+今度は半群に別の条件を追加します。
 
-Given a `Semigroup` defined on some set `A` with some `concat` operation, if there is some element in `A` – we'll call this element _empty_ – such as for every element `a` in `A` the two following equations hold true:
+ある集合 `A` 上で定義された `半群` が与えられ、何らかの `concat` 演算がある場合、空（empty） と呼ぶ要素が `A` 内に存在し、`A` の任意の元 `a` に対して次の2つの方程式が成り立つ場合：
 
-- **Right identity**: `concat(a, empty) = a`
-- **Left identity**: `concat(empty, a) = a`
+- **右単位元**: `concat(a, empty) = a`
+- **左単位元**: `concat(empty, a) = a`
 
-then the `Semigroup` is also a `Monoid`.
+その `半群` は `モノイド` でもあります。
 
-**Note**: We'll call the `empty` element **unit** for the rest of this section. There's other synonyms in literature, some of the most common ones are _neutral element_ and _identity element_.
+**注**: このセクションの残りの部分では、`empty` 要素を **単位元** と呼びます。文献によっては他の同義語を用いており、最も一般的なものは **中立元** と **単位元** です。
 
-We have seen how in TypeScript `Magma`s and `Semigroup`s, can be modeled with `interface`s, so it should not come as a surprise that the very same can be done for `Monoid`s.
+TypeScript　では、`マグマ` と `半群` が `interface` でモデル化できることを見てきました。そのため、同じことが `Monoid` にも適用できたとしても何の不思議もありません。
 
 ```ts
 import { Semigroup } from 'fp-ts/Semigroup'
@@ -39,18 +39,18 @@ interface Monoid<A> extends Semigroup<A> {
 }
 ```
 
-Many of the semigroups we have seen in the previous sections can be extended to become `Monoid`s. All we need to find is some element of type `A` for which the Right and Left identities hold true.
+前の章で見た多くの半群は `モノイド` に拡張できます。型 `A` の元で、左右両方の単位元として成り立つものを見つけるだけでよいのです。
 
 ```ts
 import { Monoid } from 'fp-ts/Monoid'
 
-/** number `Monoid` under addition */
+/** number 型における加算 `モノイド` */
 const MonoidSum: Monoid<number> = {
   concat: (first, second) => first + second,
   empty: 0
 }
 
-/** number `Monoid` under multiplication */
+/** number 型における積算 `モノイド` */
 const MonoidProduct: Monoid<number> = {
   concat: (first, second) => first * second,
   empty: 1
@@ -61,20 +61,20 @@ const MonoidString: Monoid<string> = {
   empty: ''
 }
 
-/** boolean monoid under conjunction */
+/** boolean 型における論理積モノイド */
 const MonoidAll: Monoid<boolean> = {
   concat: (first, second) => first && second,
   empty: true
 }
 
-/** boolean monoid under disjunction */
+/** boolean 型における論理和モノイド */
 const MonoidAny: Monoid<boolean> = {
   concat: (first, second) => first || second,
   empty: false
 }
 ```
 
-**Quiz**. In the semigroup section we have seen how the type `ReadonlyArray<string>` admits a `Semigroup` instance:
+**クイズ**. 半群の章では、型 `ReadonlyArray<string>` が `Semigroup` インスタンスを許容することを見てきました：
 
 ```ts
 import { Semigroup } from 'fp-ts/Semigroup'
@@ -84,21 +84,21 @@ const Semigroup: Semigroup<ReadonlyArray<string>> = {
 }
 ```
 
-Can you find the `unit` for this semigroup? If so, can we generalize the result not just for `ReadonlyArray<string>` but `ReadonlyArray<A>` as well?
+この半群における単位元を見つけることはできるでしょうか？もし見つかるのであれば、それを `ReadonlyArray<string>` だけでなく `ReadonlyArray<A>` にも一般化できますか？
 
-**Quiz** (more complex). Prove that given a monoid, there can only be one unit.
+**クイズ** (難). モノイドが与えられたとき、単位元はただ1つしか存在しないことを証明しましょう。
 
-The consequence of the previous proof is that there can be only one unit per monoid, once we find one we can stop searching.
+この証明の結果として、モノイド毎に単位元は1つしか存在せず、したがって1つ見つければ探し続ける必要はありません。
 
-We have seen how each semigroup was a magma, but not every magma was a semigroup. In the same way, each monoid is a semigroup, but not every semigroup is a monoid.
+私たちは、すべての半群がマグマであることを見てきましたが、すべてのマグマが半群であるわけではありません。同様に、すべてのモノイドは半群でありますが、すべての半群がモノイドであるわけではありません。
 
 <center>
-<img src="images/monoid.png" width="300" alt="Magma vs Semigroup vs Monoid" />
+<img src="../../images/monoid.png" width="300" alt="Magma vs Semigroup vs Monoid" />
 </center>
 
-**Example**
+**例**
 
-Let's consider the following example:
+以下の例を考えてみましょう：
 
 ```ts
 import { pipe } from 'fp-ts/function'
@@ -112,22 +112,22 @@ console.log(SemigroupIntercalate.concat('a', 'b')) // => 'a|b'
 console.log(SemigroupIntercalate.concat('a', '')) // => 'a|'
 ```
 
-Note how for this Semigroup there's no such `empty` value of type `string` such as `concat(a, empty) = a`.
+この半群には、`concat(a, empty) = a` となる `string` 型の `empty` 値が存在しないことに注意してください。
 
-And now one final, slightly more "exotic" example, involving functions:
+そして最後に、少し「奇妙な」な例を紹介します。これは関数を含んでいます：
 
-**Example**
+**例**
 
-An **endomorphism** is a function whose input and output type is the same:
+**自己準同型** は、入力と出力の型が同じ関数のことです：
 
 ```ts
 type Endomorphism<A> = (a: A) => A
 ```
 
-Given a type `A`, all endomorphisms defined on `A` are a monoid, such as:
+型 `A` が与えられた場合、`A` 上で定義されたすべての自己準同型は、次のようなモノイドです：
 
-- the `concat` operation is the usual function composition
-- the unit, our `empty` value is the identity function
+- `concat` 演算は関数合成
+- 単位元は恒等関数
 
 ```ts
 import { Endomorphism, flow, identity } from 'fp-ts/function'
@@ -139,22 +139,22 @@ export const getEndomorphismMonoid = <A>(): Monoid<Endomorphism<A>> => ({
 })
 ```
 
-**Note**: The `identity` function has one, and only one possible implementation:
+**注**: `identity` 関数の実装方法はただ1つです。
 
 ```ts
 const identity = (a: A) => a
 ```
 
-Whatever value we pass in input, it gives us the same value in output.
+どんな入力値が与えられても、その値をそのまま出力します。
 
 <!--
 TODO:
 We can start having a small taste of the importance of the `identity` function. While apparently useless per se, this function is vital to define a monoid for functions, in this case, endomorphisms. In fact, _doing nothing_, being _empty_ or _neutral_ is a tremendously valuable property to have when it comes to composition and we can think of the `identity` function as the number `0` of functions.
 -->
 
-## The `concatAll` function
+## `concatAll` 関数
 
-One great property of monoids, compared to semigrops, is that the concatenation of multiple elements becomes even easier: it is not necessary anymore to provide an initial value.
+半群に比べてモノイドの素晴らしい特性の1つは、複数の要素を連結する際に初期値を与える必要がなくなることです。
 
 ```ts
 import { concatAll } from 'fp-ts/Monoid'
@@ -169,13 +169,13 @@ console.log(concatAll(B.MonoidAll)([true, false, true])) // => false
 console.log(concatAll(B.MonoidAny)([true, false, true])) // => true
 ```
 
-**Quiz**. Why is the initial value not needed anymore?
+**クイズ**. なぜ初期値が要らなくなったのでしょうか？
 
-## Product monoid
+## 直積モノイド
 
-As we have already seen with semigroups, it is possible to define a monoid instance for a `struct` if we are able to define a monoid instance for each of its fields.
+半群と同様に、`struct` の各フィールドに対してモノイドインスタンスを定義できれば、`struct` のモノイドインスタンスを定義することが可能です。
 
-**Example**
+**例**
 
 ```ts
 import { Monoid, struct } from 'fp-ts/Monoid'
@@ -192,7 +192,7 @@ const Monoid: Monoid<Point> = struct({
 })
 ```
 
-**Note**. There is a combinator similar to `struct` that works with tuples: `tuple`.
+**注**. `struct` と同様の動作をする `tuple` とコンビネータが存在します。
 
 ```ts
 import { Monoid, tuple } from 'fp-ts/Monoid'
@@ -203,8 +203,8 @@ type Point = readonly [number, number]
 const Monoid: Monoid<Point> = tuple(N.MonoidSum, N.MonoidSum)
 ```
 
-**Quiz**. Is it possible to define a "free monoid" for a generic type `A`?
+**クイズ**. ジェネリックな型 `A` に対して「自由モノイド」を定義することは可能でしょうか？
 
-**Demo** (implementing a system to draw geoetric shapes on canvas)
+**デモ** (キャンバス上に幾何学的な形状を描画するシステムを実装する)
 
-[`03_shapes.ts`](src/03_shapes.ts)
+[`03_shapes.ts`](../03_shapes.ts)
