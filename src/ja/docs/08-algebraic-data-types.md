@@ -120,7 +120,8 @@ type Clock = [Hour, Period]
 
 直和型は、異なる（しかし限られた）型の値を保持できるデータ型です。一つのインスタンスはこれらの型の中から一つだけ使用でき、通常はこれらの型を区別する「タグ」値があります。
 
-TypeScript の公式ドキュメントでは、これらは [discriminated union](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html) と呼ばれます。
+TypeScript の公式ドキュメントでは、これらは [discriminated union](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions) と呼ばれます。
+
 
 重要な点として、直和型のメンバは **素集合** である必要がある、つまり複数のメンバに属する値が存在してはいけません。
 
