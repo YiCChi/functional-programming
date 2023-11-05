@@ -455,7 +455,6 @@ f': X ⟶ Option(Y)
 ```
 
 TypeScript の直和型について一定の理解をしたので、`Option` をある程度問題なく定義できるでしょう。
-Now that we know a bit more about sum types in TypeScript we can define the `Option` without much issues.
 
 ### `Option` 型
 
