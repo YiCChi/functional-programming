@@ -3,7 +3,7 @@
 <center>
 <img src="../../images/moggi.jpg" width="300" alt="Eugenio Moggi" />
 
-(Eugenio Moggi は、イタリア・ジェノヴァ大学の計算機科学の教授である。彼は、構造化プログラミングにおいて広くモナドを用いることを提言した最初の人物である)
+(Eugenio Moggi は、イタリアジェノヴァ大学の計算機科学教授。彼はプログラムを構造化する為のモナドの一般的使用法を初めて記述した)
 
 <img src="../../images/wadler.jpg" width="300" alt="Philip Lee Wadler" />
 
