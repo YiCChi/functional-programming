@@ -58,7 +58,7 @@ const followersOfFollowers = pipe(user, getFollowers, A.map(getFollowers))
 
 入れ子になった配列を **平坦化** する必要があります。
 
-The function `flatten: <A>(mma: ReadonlyArray<ReadonlyArray<A>>) => ReadonlyArray<A>` exported by the `fp-ts/ReadonlyArray` is exactly what we need:
+`fp-ts/ReadonlyArray` が exports している関数 `flatten: <A>(mma: ReadonlyArray<ReadonlyArray<A>>) => ReadonlyArray<A>` がまさに求めているものです：
 
 ```ts
 // followersOfFollowers: ReadonlyArray<User>
