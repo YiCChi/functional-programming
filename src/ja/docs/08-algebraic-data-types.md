@@ -317,8 +317,7 @@ export const length: <A>(fa: List<A>) => number = match(
 
 **クイズ**. なぜ `head` API は最適ではないのでしょうか？
 
-// TODO ファイルコピーとリンク修正
--> See the [answer here](src/quiz-answers/pattern-matching.md)
+-> [答え](../quiz-answers/pattern-matching.md)
 
 **注**. TypeScript は直積型に対する素晴らしい機能 **exhaustive check** を提供しています。型検査によって、関数の中身に定義された `switch` がすべてのあり得るケースが適切に処理しているか確認することができます。
 
@@ -714,14 +713,14 @@ console.log(OrdOptionMyTuple.compare(o1, o3)) // => -1
 あとは、ユーザに `A` の `半群` インスタンスを提供することを要求し、それをもとに `Option<A>` の `半群` インスタンスを導出すればよいです。
 
 ```ts
-// 実装は読者諸君の宿題とする
+// 実装は読者への宿題とする
 declare const getApplySemigroup: <A>(S: Semigroup<A>) => Semigroup<Option<A>>
 ```
 
 **クイズ**. 前に示した半群に初期値を追加してモノイドにすることはできるでしょうか？
 
 ```ts
-// 実装は読者諸君の宿題とする
+// 実装は読者への宿題とする
 declare const getApplicativeMonoid: <A>(M: Monoid<A>) => Monoid<Option<A>>
 ```
 
@@ -735,14 +734,13 @@ declare const getApplicativeMonoid: <A>(M: Monoid<A>) => Monoid<Option<A>>
 | some(a1) | some(a2) | some(S.concat(a1, a2)) |
 
 ```ts
-// 実装は読者諸君の宿題とする
+// 実装は読者への宿題とする
 declare const getMonoid: <A>(S: Semigroup<A>) => Monoid<Option<A>>
 ```
 
-**クイズ**. モノイドにおいて `empty` とは何ですか？
+**クイズ**. このモノイドにおいて `empty` は何に当たりますか？
 
-// TODO: ファイル持ってくる。リンク修正する。
--> [答え](src/quiz-answers/option-semigroup-monoid-second.md)
+-> [答え](../quiz-answers/option-semigroup-monoid-second.md)
 
 **例**
 
