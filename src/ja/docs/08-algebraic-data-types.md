@@ -404,7 +404,7 @@ class Textbox extends React.Component<Props> {
 }
 ```
 
-**例** (ノード・コールバック)
+**例** (node callbacks)
 
 ```ts
 declare function readFile(
