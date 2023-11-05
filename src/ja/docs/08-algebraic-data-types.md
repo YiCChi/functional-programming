@@ -319,7 +319,7 @@ export const length: <A>(fa: List<A>) => number = match(
 
 -> [答え](../quiz-answers/pattern-matching.md)
 
-**注**. TypeScript は直積型に対する素晴らしい機能 **exhaustive check** を提供しています。型検査によって、関数の中身に定義された `switch` がすべてのあり得るケースが適切に処理しているか確認することができます。
+**注**. TypeScript は直積型に対する素晴らしい機能 **exhaustive check** を提供しています。型検査のおかげで、関数の中身に定義された `switch` によってすべてのあり得るケースが適切に処理されているか確認することができます。
 
 ### なぜ「直和」型なのか？
 
