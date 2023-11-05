@@ -376,7 +376,8 @@ class Textbox extends React.Component<Props> {
 }
 ```
 
-ここで何が問題かというと、`Props` は直積指向でモデル化されていながら、`onChainge` が `editable` に **依存している** ことです。
+ここで何が問題かというと、`Props` は直積指向でモデル化されていながら、`onChange` が `editable` に **依存している** ことです。
+
 
 この場合は直和型がより良いです：
 
