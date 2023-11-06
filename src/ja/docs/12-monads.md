@@ -73,7 +73,7 @@ const followersOfFollowers = pipe(
 いいですね！ 他の型も見てみましょう。
 
 **例** (`F = Option`)
-数列の最初の要素の逆数を求めたい場合を考えます。
+数値配列の最初の要素の逆数を求めたい場合を考えます。
 ```ts
 import { pipe } from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
