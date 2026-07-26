@@ -22,4 +22,4 @@ const SemigroupRetryPolicy: Semigroup<RetryPolicy> = {
 - `concat`满足结合律:
   给定3个`RetryPolicy`，`first`，`second`与`third`。和一个`status`:
   - 如果任意一个`RetryPolicy`返回`undefined`，那么`concat(concat(first, second), third)(status)`与`concat(first, concat(second, third))(status)`都将会是`undefined`。
-  - 如果所有的`RetryPolicy`都返回一个数字，那么`concat(concat(first, second), third)(status)`的结果会是`Math.max(Math.max(delay1, delay2), delay3)`，`concat(first, concat(second, third))(status)`的结果会是`Math.max(delay1, Math.max(delay2, delay3))`。`Math.max`满足交换律，因此结果会是`delay1`，`delay2`，`delay3`中的最大值。
+  - 如果所有的`RetryPolicy`都返回一个数字，那么`concat(concat(first, second), third)(status)`的结果会是`Math.max(Math.max(delay1, delay2), delay3)`，`concat(first, concat(second, third))(status)`的结果会是`Math.max(delay1, Math.max(delay2, delay3))`。`Math.max`满足结合律，因此结果会是`delay1`，`delay2`，`delay3`中的最大值。

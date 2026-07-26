@@ -16,7 +16,7 @@ const SemigroupSum: Semigroup<number> = {
 }
 ```
 
-`concat(a, b) = a + b = b + a = concat(b, a)`ので、加算は交換法則に満たしています。
+加算は交換法則を満たすため、`concat(a, b) = a + b = b + a = concat(b, a)` が成り立ちます。
 
 ### 交換法則に満たさない
 

@@ -1,4 +1,4 @@
-# `ord` で順序関係をモデリングする (Modeling ordering relations with `Ord`)
+# `Ord` で順序関係をモデリングする (Modeling ordering relations with `Ord`)
 
 前の `Eq` の章では **等価性** の概念を扱いました。この章では **順序付け** の概念を扱います。
 
@@ -121,7 +121,7 @@ const max = flow(reverse, min)
 pipe(2, max(N.Ord)(1), console.log) // => 2
 ```
 
-順序付けの **完全性** （任意の `x` と `y` に対して、`x <= y` または `y <= z` の少なくとも一方が成立する必要があること）は、数値に関しては明らかに思えるかもしれませんが、必ずしもそのようなわけではありません。少し複雑なシナリオを見てみましょう：
+順序付けの **全域性** （任意の `x` と `y` に対して、`x <= y` または `y <= x` の少なくとも一方が成立する必要があること）は、数値に関しては明らかに思えるかもしれませんが、必ずしもそのようなわけではありません。少し複雑なシナリオを見てみましょう：
 
 ```ts
 type User = {
@@ -253,8 +253,8 @@ console.log(
 interface Customer {
   readonly name: string
   readonly favouriteThings: ReadonlyArray<string>
-  readonly registeredAt: number // エポック秒
-  readonly lastUpdatedAt: number // エポック秒
+  readonly registeredAt: number // エポックからの経過ミリ秒
+  readonly lastUpdatedAt: number // エポックからの経過ミリ秒
   readonly hasMadePurchase: boolean
 }
 ```
@@ -275,8 +275,8 @@ import * as S from 'fp-ts/string'
 interface Customer {
   readonly name: string
   readonly favouriteThings: ReadonlyArray<string>
-  readonly registeredAt: number // エポック秒
-  readonly lastUpdatedAt: number // エポック秒
+  readonly registeredAt: number // エポックからの経過ミリ秒
+  readonly lastUpdatedAt: number // エポックからの経過ミリ秒
   readonly hasMadePurchase: boolean
 }
 

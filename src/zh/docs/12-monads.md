@@ -9,7 +9,7 @@
 
 （Philip Lee Wadler是一位美国计算机科学家，因其对编程语言设计和类型理论的贡献而闻名）
 
-在上一章里，我们看到了如何用一个`n`元纯程序`g`来编写一个有作用的程序`f: (a: A) => F<B>`，当且仅当类型构造函数`F`承认一个应用函子实例：
+在上一章里，我们看到了当且仅当类型构造函数`F`承认一个应用函子实例时，如何将一个有作用的程序`f: (a: A) => F<B>`与一个`n`元纯程序`g`组合：
 
 | Program f | Program g     | Composition     |
 | --------- | ------------- | --------------- |
@@ -32,7 +32,7 @@ g: (b: B) => F<C>;
 
 **例** (`F = Array`)
 
-假设我们想获得followe的followers。
+假设我们想获得followers的followers。
 
 ```ts
 import { pipe } from 'fp-ts/function';
@@ -97,7 +97,7 @@ const inverseHead = pipe([1, 2, 3], A.head, O.map(inverse));
 const inverseHead = pipe([1, 2, 3], A.head, O.map(inverse), O.flatten);
 ```
 
-所有这些`flatten`并不是巧合。在幕后有一个函数模式：两个类型构造函数`ReadonlyArray`和`Option`（以及其他）承认 **monad 实例** 并且
+所有这些`flatten`并不是巧合。在幕后有一个函数式模式：两个类型构造函数`ReadonlyArray`和`Option`（以及其他）承认 **monad 实例** 并且
 
 > `flatten`是单子最特殊的运算
 
@@ -138,7 +138,7 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>;
 - 为什么需要`of`和`chain`？为什么他们需要这样的签名？
 - 为什么它们有`pure`或`flatMap`等同义词？
 - 为什么需要遵守三个定律？他们的意思是什么？
-- 如果`flatten`对于单子如此重要，为什么它的定义不具有可比性？
+- 如果`flatten`对于单子如此重要，为什么它没有出现在单子的定义中？
 
 这一章将尝试回答上述问题。
 
@@ -173,11 +173,13 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>;
 
 （上方是 _TS_ 范畴中的组合，下方是 _K_ 结构中的组合）
 
-那么 _K_ 中的`f`和`g`的组合是什么？它是下图中名为`h`的红色箭头：
+那么 _K_ 中的`f`和`g`的组合是什么？它是下图中名为`h'`的红色箭头：
 
 <img src="../../images/kleisli_composition.png" alt="above the composition in the TS category, below the composition in the K construction" width="400px" />
 
-假设`h`是`K`中从`A`到`C`的箭头，我们可以在`TS`中找到从`A`到`M<C>`的对应函数`h`。
+（上方是 _TS_ 范畴中的组合，下方是 _K_ 结构中的组合）
+
+假设`h'`是`K`中从`A`到`C`的箭头，我们可以在`TS`中找到从`A`到`M<C>`的对应函数`h`。
 
 因此，_TS_ 中`f`和`g`的组合一个很好的候选者仍然是具有以下签名的 Kleisli 箭头：`(a: A) => M<C>`。
 
@@ -227,7 +229,7 @@ chain = flatten ∘ map(g)
 
 （ `of`的出处）
 
-事实上，`of`是`chain`的单位元素，允许以下的流量控制（很常见）：
+事实上，`of`是`chain`的单位元素，允许以下的控制流（很常见）：
 
 ```ts
 pipe(
@@ -456,7 +458,7 @@ export const time = <A,>(ma: IO.IO<A>): IO.IO<A> =>
 
 ```haskell
 now :: IO Int
-now = undefined -- Haskell中`undefined`相当于TypeScript的声明
+now = undefined -- Haskell中的`undefined`相当于TypeScript的`declare`
 
 log :: String -> IO ()
 log = undefined
@@ -654,7 +656,7 @@ const program4 = (D: Deps) => {
 };
 ```
 
-通过简单更改`FileSystem`的定义即可达到效果。我们可以修改程序，使其异步运行
+只需对`FileSystem`作用的定义做一个简单的更改，我们就可以修改程序，使其异步运行
 
 ```diff
 // -----------------------------------------

@@ -90,7 +90,7 @@ const Semigroup: Semigroup<ReadonlyArray<string>> = {
 
 证明的结果表示，每一个幺半群只能有一个单位元，因此当找到一个单位元后便不必再继续寻找。
 
-每个幺半群都是半群，反之则不成立。
+我们已经看到，每个半群都是原群，但并非每个原群都是半群。同样地，每个幺半群都是半群，但并非每个半群都是幺半群。
 
 <img src="../../images/monoid.png" width="300" alt="Magma vs Semigroup vs Monoid" />
 

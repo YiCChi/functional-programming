@@ -10,7 +10,7 @@ const MagmaSub: Magma<number> = {
 }
 ```
 
-`concat`が閉じているという事実は自明な性質ではありません。`A`がJavaScriptの数値型（正と負の浮動小数点数の集合）ではなく、自然数の集合である場合、`MagmaSub`の`concat`で`Magma<Natural>`を定義できますか？自然数において閉じていない他の`concat`演算はありますか？
+`concat`が閉じているという事実は自明な性質ではありません。`A`がJavaScriptの数値型（正と負の浮動小数点数の集合）ではなく、自然数（正の整数として定義される）の集合である場合、`MagmaSub`の`concat`で`Magma<Natural>`を定義できますか？自然数において閉じていない他の`concat`演算はありますか？
 
 ## 答え
 

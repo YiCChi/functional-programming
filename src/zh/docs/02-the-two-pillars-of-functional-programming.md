@@ -143,6 +143,6 @@ console.log(pipe(2, double, double, double)); // => 16
 
 正如在demo中所演示的，仅用3个原语和两个 combinator，我们就能够表达相当复杂的策略。
 
-仔细思考便可以发现，每添加一个原语或一个 combinator 便可以使表达可能性翻倍。
+仔细思考便可以发现，每添加一个原语或一个 combinator 便可以使表达可能性呈指数级增长。
 
 在这里我想特别提到 `01_retry.ts` 的两个 combinator 中的 `concat`，因为它涉及到一个非常强大的函数式编程抽象：半群(semigroup)。

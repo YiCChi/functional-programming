@@ -26,6 +26,8 @@ console.log(product([1, 2, 3, 4])); // => 72
 `concatAll`は`A`型の値を返します。入力として受け取る要素の配列が空の場合、その中から`A`型の要素を取得して返すことができません。
 初期値を強制することで、配列が空の場合にその初期値を返すことができます。
 
+`NonEmptyArray<A>` を受け取り、初期値を必要としない `concatAll` を定義することもできます。実装はとても簡単です：
+
 ```ts
 import * as Semigroup from 'fp-ts/Semigroup'
 import * as NEA from 'fp-ts/NonEmptyArray'

@@ -1,4 +1,4 @@
-# `eq`で等価をモデリングする（Modelling equivalence with `Eq`）
+# `Eq`で等価をモデリングする（Modelling equivalence with `Eq`）
 
 前節と似たように、等価の概念をモデル化できます。
 
@@ -211,16 +211,10 @@ const EqStandard: Eq<User> = struct({
 });
 ```
 
-**注**：Haskell のような言語では、`User`のような構造体の標準`Eq`インスタンスはコンパイラによって自動的に生成されます。
-
-```haskell
-data User = User Int String
-     deriving (Eq)
-```
-
-違うコンテキストでは、ユーザーの等価が異なる意味を持つ可能性があります。例えば、`id`が等しい場合、同じユーザーだとみなします。
+Haskell のような純粋関数型言語を含む多くの言語では、1つのデータ型につき複数の`Eq`インスタンスを定義することはできません。しかし、コンテキストによって`User`の等価性の意味は異なりうるのです。よくあるのは、`id`フィールドが等しければ2つの`User`は等しいとみなすコンテキストです。
 
 ```ts
+/** 2つのユーザーは`id`フィールドが等しければ等しい */
 const EqID: Eq<User> = {
   equals: (first, second) => N.Eq.equals(first.id, second.id),
 };

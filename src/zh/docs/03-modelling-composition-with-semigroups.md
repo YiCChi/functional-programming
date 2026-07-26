@@ -21,6 +21,14 @@
 
 ## 原群(Magma)的定义
 
+`Magma<A>`是一种非常简单的代数结构：
+
+- 一个集合或类型(A)
+- 一个`concat`运算
+- 无需遵守任何定律
+
+**注**：在大多数情况下，_集合(set)_ 和 _类型(type)_ 这两个术语可以互换使用。
+
 我们可以用 TypeScript 的`interface` 去建模一个原群
 
 ```ts
@@ -119,7 +127,7 @@ pipe(MagmaSub.concat(1, MagmaSub.concat(2, 3)), console.log); // => 2
 a * b * c * d * e * f * g * h = ((a * b) * (c * d)) * ((e * f) * (g * h))
 ```
 
-子计算可以并列运行。
+子计算可以并行运行。
 
 与`Magma`类似，`Semigroup`也可以通过TypeScript的`interface`定义:
 
@@ -131,7 +139,7 @@ interface Semigroup<A> extends Magma<A> {}
 
 以下定律必须成立：
 
-- **结合律**: 如果`S`是一个半群则对任意属于`S`的`x`，`y`，`z`，下式必然成立：
+- **结合律**: 如果`S`是一个半群则对任意类型为`A`的`x`，`y`，`z`，下式必然成立：
 
 ```ts
 S.concat(S.concat(x, y), z) = S.concat(x, S.concat(y, z));
@@ -174,7 +182,7 @@ const SemigroupSum: Semigroup<number> = {
 };
 ```
 
-**测验**：定义在[`01_retry.ts`](../01_retry.ts)中的combinator `concat`能否用来给`RetryPolicy`定义一个半群接口？
+**测验**：定义在[`01_retry.ts`](../01_retry.ts)中的combinator `concat`能否用来给`RetryPolicy`定义一个半群实例？
 
 > [答案](../quiz-answers/semigroup-demo-concat.md)
 
@@ -201,7 +209,7 @@ const SemigroupString: Semigroup<string> = {
 };
 ```
 
-这里还有一个`boolean`类型的例子：
+这里还有两个`boolean`类型的例子：
 
 ```ts
 import { Semigroup } from 'fp-ts/Semigroup';
@@ -362,7 +370,7 @@ const SemigroupVector: Semigroup<Vector> = struct({
 });
 ```
 
-**注**：还有一个类似于`struct`的combinator可以用于元祖：`tuple`
+**注**：还有一个类似于`struct`的combinator可以用于元组：`tuple`
 
 ```ts
 import * as N from 'fp-ts/number';
