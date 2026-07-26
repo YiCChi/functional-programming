@@ -11,7 +11,7 @@
 
 </center>
 
-前章では、`F` がアプリカティブ関手インスタンスであるならば、作用プログラム `f: (a: A) => F<B>` と、`n` 項の純粋プログラム `g` を合成できるということを見てきました：
+前章では、型コンストラクタ `F` がアプリカティブ関手インスタンスを持つ場合、かつその場合に限り、作用プログラム `f: (a: A) => F<B>` と、`n` 項の純粋プログラム `g` を合成できるということを見てきました：
 
 | プログラム f | プログラム g     | 合成     |
 | --------- | ------------- | --------------- |
@@ -131,7 +131,7 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 - `chain(f) ∘ of = f` (**右単位元**)
 - `chain(h) ∘ (chain(g) ∘ f) = chain((chain(h) ∘ g)) ∘ f` (**結合律**)
 
-ただし、`f` `g` `h` はすべて作用プログラムであって、`*` は普通の関数合成を表します。
+ただし、`f` `g` `h` はすべて作用プログラムであって、`∘` は普通の関数合成を表します。
 
 私が初めてこの定義を見たとき、多くの疑問が浮かびました：
 
@@ -156,7 +156,7 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 
 > 圏は合成の本質を捉えています
 
-私たちの問題を次のような圏の問題に変換できます： クライスリ射の合成をモデル化する県を見つけることができるでしょうか？
+私たちの問題を次のような圏の問題に変換できます： クライスリ射の合成をモデル化する圏を見つけることができるでしょうか？
 
 ## クライスリ圏
 
@@ -170,16 +170,18 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 クライスリ射のみを含む圏 **K**（クライスリ圏と呼ばれます）を構築してみましょう：
 
 - **対象** ： 圏 **TS** の対象と同じであり、TypeScriptのすべての型です。
-- **射** : **TS** にクライスリ射 `f: A ⟼ M<B>` が存在する場合、**K** に射 `f': A ⟼ B` にも射を描きます。
+- **射** : **TS** にクライスリ射 `f: A ⟼ M<B>` が存在するたびに、**K** に射 `f': A ⟼ B` を描きます。
 <center>
 <img src="../../images/kleisli_category.png" alt="above the TS category, below the K construction" width="400px" />
+
+（上は圏 **TS** で、下は **K** の構築です）
 
 </center>
 
 では、 **K** における `f` と `g` の合成はどうなるのでしょうか？ 下図の `h'` と名付けられた赤い射がこれに該当します。
 
 <center>
-<img src="images/kleisli_composition.png" alt="above the composition in the TS category, below the composition in the K construction" width="400px" />
+<img src="../../images/kleisli_composition.png" alt="above the composition in the TS category, below the composition in the K construction" width="400px" />
 
 （上は圏 **TS** 内の合成で、下は **K** 内の合成です）
 
@@ -187,7 +189,7 @@ chain: <A, B>(f: (a: A) => M<B>) => (ma: M<A>) => M<B>
 
 `h'` が **K** 内における `A` から `C` への射であるとすると、これに対応する **TS** 内の `A` から `M<C>` 関数 `h` を見出すことができます。
 
-したがって、**TS** での `f` と `g` の合成の候補として良いのは、次のシグネチャを持つクライスリ射です： `(a: A) => M<C>。`
+したがって、**TS** での `f` と `g` の合成の候補として良いのは、次のシグネチャを持つクライスリ射です： `(a: A) => M<C>`。
 
 そのような関数を実装してみましょう。
 
@@ -234,7 +236,7 @@ chain = flatten ∘ map(g)
 | 作用      | 純粋, `n` 項  | `liftAn(g) ∘ f` |
 | 作用      | 作用          | `chain(g) ∘ f`  |
 
-`of` についてはどうでしょうか？ `of` は **K** 内の恒等射から生み出されます。つまり、**K** 内のすべての恒等射 1<sub>A</> に対して、 `A` から `M<A>` への対応付けをする関数がなければなりません。
+`of` についてはどうでしょうか？ `of` は **K** 内の恒等射から生み出されます。つまり、**K** 内のすべての恒等射 1<sub>A</sub> に対して、 `A` から `M<A>` への対応付けをする関数（つまり、`of: <A>(a: A) => M<A>`）がなければなりません。
 
 <center>
 <img src="../../images/of.png" alt="where of comes from" width="300px" />
@@ -243,9 +245,7 @@ chain = flatten ∘ map(g)
 
 </center>
 
-// TODO: neutral 訳す
-// TODO: flux control 調べて直す
-`of` が `chain` の neutral 要素であることから、以下のようなフラックス制御（非常に一般的）が可能になります：
+`of` が `chain` の単位元であることから、次のような（ごく一般的な）制御フローが可能になります：
 
 ```ts
 pipe(
@@ -515,7 +515,7 @@ const randomFib: IO.IO<void> = pipe(
   IO.chain((n) => log([n, fib(n)]))
 )
 
-// `IO<void>` のモナドインスタンス
+// `IO<void>` のモノイドインスタンス
 const MonoidIO: Monoid<IO.IO<void>> = {
   concat: (first, second) => () => {
     first()

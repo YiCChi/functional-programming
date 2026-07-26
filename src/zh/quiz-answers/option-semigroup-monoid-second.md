@@ -22,7 +22,7 @@ declare const getMonoid: <A>(S: Semigroup<A>) => Monoid<Option<A>>
 
 幺半群的`empty`应该是`none`，因为它遵循所有幺半群定律。让我们检查一下：
 
-**交换律**：
+**结合律**：
 
 ```ts
 concat(none, concat(none, concat(none))) === concat(concat(none, none), none)

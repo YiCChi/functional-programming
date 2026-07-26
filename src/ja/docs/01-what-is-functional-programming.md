@@ -83,7 +83,7 @@ const xs: Array<number> = [1, 2, 3];
 // 変換
 const double = (n: number): number => n * 2;
 
-// 結果: 各`xs`no要素が倍になる配列が欲しい
+// 結果: `xs`の各要素が倍になる配列が欲しい
 const ys: Array<number> = xs.map(double);
 ```
 

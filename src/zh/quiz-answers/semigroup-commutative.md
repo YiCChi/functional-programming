@@ -16,7 +16,7 @@ const SemigroupSum: Semigroup<number> = {
 }
 ```
 
-`concat(a, b) = a + b = b + a = concat(b, a)`所以加法满足交换律
+由于加法满足交换律，因此 `concat(a, b) = a + b = b + a = concat(b, a)`
 
 ### 不满足交换律
 

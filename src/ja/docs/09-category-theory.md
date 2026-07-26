@@ -20,7 +20,7 @@ const program = pipe(
 )
 ```
 
-こんな風にコーディングすることで、どのぐらい簡潔になるのでしょうか？
+しかし、このようなスタイルでコードを書くのは、どのぐらい簡単なのでしょうか？
 ちょっとやってみましょう。
 
 ```ts
@@ -206,7 +206,7 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 
 <img src="../../images/spoiler.png" width="900" alt="The four composition recipes" />
 
-この章の初めに取り組んだ問題は、`F` が `Option` 型の場合、つまり次のような場合に対応します:
+この章の初めに取り組んだ問題は、2つ目のケース、つまり `F` が `Option` 型である次のような場合に対応します:
 
 ```ts
 // A = ReadonlyArray<number>, B = number, F = Option

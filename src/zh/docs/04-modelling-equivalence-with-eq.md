@@ -1,4 +1,4 @@
-# 用`eq`建模等价(Modelling equivalence with `Eq`)
+# 用`Eq`建模等价(Modelling equivalence with `Eq`)
 
 我们仍然可以用TypeScript的接口对等价建模。
 
@@ -209,14 +209,7 @@ const EqStandard: Eq<User> = struct({
 });
 ```
 
-在像Haskell这样的语言中，像`User`这样的结构的标准`Eq`实例可以由编译器自动生成。
-
-```haskell
-data User = User Int String
-     deriving (Eq)
-```
-
-但是在某些特定情况下，我们可能对不同用户之间的某种类型的相等感兴趣。例如，如果两个用户具有相同的`id`，我们可以认为他们是相等的。
+有些语言，甚至像 Haskell 这样的纯函数式语言，不允许同一数据类型拥有多个`Eq`实例。但我们可能在不同的上下文中需要不同的`User`相等语义。一种常见的情形是：如果两个`User`的`id`字段相等，则认为他们相等。
 
 ```ts
 /** 如果两个user的`id`相同，则他们相同 */

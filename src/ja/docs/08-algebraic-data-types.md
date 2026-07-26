@@ -19,7 +19,7 @@
 <img src="../../images/adt.png" width="400" alt="ADT" />
 </center>
 
-より単純な直積型から見ていきましょう。
+より馴染みのある直積型から見ていきましょう。
 
 ## 直積型
 
@@ -303,7 +303,7 @@ export const isEmpty = match(
   () => false
 )
 
-// リストの先頭か `undifined` かを返す
+// リストの先頭か `undefined` かを返す
 export const head = match(
   () => undefined,
   (head, _tail) => head
@@ -320,7 +320,7 @@ export const length: <A>(fa: List<A>) => number = match(
 
 -> [答え](../quiz-answers/pattern-matching.md)
 
-**注**. TypeScript は直積型に対する素晴らしい機能 **exhaustive check** を提供しています。型検査のおかげで、関数の中身に定義された `switch` によってすべてのあり得るケースが適切に処理されているか確認することができます。
+**注**. TypeScript は直和型に対する素晴らしい機能 **exhaustive check** を提供しています。型検査のおかげで、関数の中身に定義された `switch` によってすべてのあり得るケースが適切に処理されているか確認することができます。
 
 ### なぜ「直和」型なのか？
 
@@ -496,7 +496,7 @@ const match = <R, A>(onNone: () => R, onSome: (a: A) => R) => (
 }
 ```
 
-`Option` 型を使用することで、例外が投げられたり値が存在しなかったりする場合を表現せずに済みます。したがって、以下のような、型システムが失敗の可能性に関知しないコードは、
+`Option` 型は、例外を投げるのを避けたり、オプショナルな値を表現したりするために使用できます。したがって、以下のような、型システムが失敗の可能性に関知しないコードは、
 
 ```ts
 //                              これは嘘 ↓
@@ -553,7 +553,7 @@ pipe(result, match(
 ))
 ```
 
-前の章で見た抽象インスタンスを定義することは可能でしょうか？まず、`Eq` から見ていきましょう。
+これまでの章で見てきた抽象に対するインスタンスを定義することは可能でしょうか？まず、`Eq` から見ていきましょう。
 
 ### `Eq` インスタンス
 
@@ -642,7 +642,7 @@ console.log(EqOptionString.equals(some('a'), some('b'))) // => false
 console.log(EqOptionString.equals(some('a'), some('a'))) // => true
 ```
 
-`Option<A>` 型の `Eq` インスタンスを定義できて何が一番嬉しいかというと、ここまで見てきた `Eq` インスタンスすべてに対してこれを適用できる点です。
+`Option<A>` 型の `Eq` インスタンスを定義できて何が一番嬉しいかというと、これまで `Eq` に対して見てきたコンビネータすべてを活用できる点です。
 
 **例**:
 
@@ -718,7 +718,7 @@ console.log(OrdOptionMyTuple.compare(o1, o3)) // => -1
 declare const getApplySemigroup: <A>(S: Semigroup<A>) => Semigroup<Option<A>>
 ```
 
-**クイズ**. 前に示した半群に初期値を追加してモノイドにすることはできるでしょうか？
+**クイズ**. 前に示した半群に単位元を追加してモノイドにすることはできるでしょうか？
 
 ```ts
 // 実装は読者への宿題とする
@@ -765,7 +765,7 @@ export const getFirstMonoid = <A = never>(): Monoid<Option<A>> =>
   getMonoid(first())
 ```
 
-そしてもう一つは：
+そしてその双対です：
 
 （最も右側の `None` でない値を返すモノイド）
 

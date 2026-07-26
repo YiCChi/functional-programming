@@ -84,7 +84,7 @@ console.log(addFollower(follower)(user));
 
 - 我们没有一个完整的`follower`只有他的`id`
 - 我们没有一个完整的`user`只有他的`id`
-- 我们有一个`fetchUser` API，给定一个`id`，他会查询并返回而相应的`User`
+- 我们有一个`fetchUser` API，给定一个`id`，它会查询并返回相应的`User`
 
 ```ts
 import * as T from 'fp-ts/Task';
@@ -170,7 +170,7 @@ map(g): (fb: F<B>) => F<(c: C) => D>
 declare const ap: <A>(fa: Task<A>) => <B>(fab: Task<(a: A) => B>) => Task<B>;
 ```
 
-**注**：为什么要叫`ap`？因为它可以被看作某种函数应用程序。
+**注**：为什么要叫`ap`？因为它可以被看作某种形式的函数应用(function application)。
 
 ```ts
 // `apply`应用函数到某一个值
@@ -462,7 +462,7 @@ const of =
 
 ## 组合应用函子
 
-应用函子，意味着给定两个应用函子`F`和`G`，它们的组合`F<G<A>>`仍然是一个应用函子。
+应用函子可以组合，这意味着给定两个应用函子`F`和`G`，它们的组合`F<G<A>>`仍然是一个应用函子。
 
 **例** (`F = Task`, `G = Option`)
 

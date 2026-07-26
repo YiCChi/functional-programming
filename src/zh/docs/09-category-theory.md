@@ -3,7 +3,7 @@
 
 我们已经看到，函数式编程的基石是**组合**。
 
-> 我们如何解决问题？我们将更大的问题分解为更小的问题。如果较小的问题仍然太大，我们会进一步分解它们，依此类推。最后，我们编写解决所有小问题的代码。然后是编程的本质：我们编写这些代码片段来创建更大问题的解决方案。如果我们无法将碎片重新组合在一起，那么分解就没有意义。- Bartosz Milewski
+> 我们如何解决问题？我们将更大的问题分解为更小的问题。如果较小的问题仍然太大，我们会进一步分解它们，依此类推。最后，我们编写解决所有小问题的代码。然后是编程的本质：我们将这些代码片段组合起来，构成更大问题的解决方案。如果我们无法将碎片重新组合在一起，那么分解就没有意义。- Bartosz Milewski
 
 但这到底意味着什么？我们如何判断两个事物是否可以 _组合_？我们怎么判断两个事物是否组合得 _很好_ 呢？
 
@@ -55,6 +55,10 @@ double: (n: number) => number;
 
 幸运的是，70 多年来，属于人类历史上运行时间最长、规模最庞大的开源项目（数学）的一大批学者一直致力于开发一种针对可组合性的理论：**范畴论**，这是数学的一个分支，由Saunders Mac Lane与Samuel Eilenberg一起创立(1945)。
 
+> 范畴抓住了组合的本质。
+
+Saunders Mac Lane
+
 <img src="../../images/maclane.jpg" width="300" alt="Saunders Mac Lane" />
 
 (Saunders Mac Lane)
@@ -104,7 +108,7 @@ double: (n: number) => number;
 
 <img src="../../images/associativity.png" width="500" alt="associativity" />
 
-- (**单位元**) 对于每个对象`X`，都有一个态射`identity: X ⟼ X`称为`X`的 _单位态射_，使得对每个态射`f: A ⟼ X`，都会有`identity ∘ f = f = f ∘ identity`。
+- (**单位元**) 对于每个对象`X`，都有一个态射`identity: X ⟼ X`称为`X`的 _单位态射_，使得对每个态射`f: A ⟼ X`和`g: X ⟼ B`，都有`identity ∘ f = f`且`g ∘ identity = g`。
 
 <img src="../../images/identity.png" width="300" alt="identity" />
 
@@ -112,7 +116,7 @@ double: (n: number) => number;
 
 <img src="../../images/category.png" width="300" alt="a simple category" />
 
-这个范畴很简单，只有三个对象和六个态射（idA、idB、idC是A、B、C的单位态射）。
+这个范畴很简单，只有三个对象和六个态射（1<sub>A</sub>、1<sub>B</sub>、1<sub>C</sub>是`A`、`B`、`C`的单位态射）。
 
 ## 用范畴建模编程语言
 
@@ -160,7 +164,7 @@ const gf = (s: string): boolean => g(f(s));
 
 - **对象**是所有可能的TypeScript类型：`string`、`number`、`ReadonlyArray<string>` 等...
 - **态射**是所有的TypeScript函数：`(a: A) => B`、`(b: B) => C`、...其中 `A`、`B`、`C`、. .. 是TypeScript类型
-- **单位态射**全部编码在单个多态函数`const Identity = <A>(a: A): A => a` 中
+- **单位态射**全部编码在单个多态函数`const identity = <A>(a: A): A => a` 中
 - **态射的组合**是通常的函数组合（我们知道它是满足结合律的）
 
 作为TypeScript的模型，_TS_ 范畴可能看起来有点局限：没有循环，没有`if`，几乎什么都没有。话虽这么说，简化的模型足够丰富，可以帮助我们实现我们的目标：推理明确定义的组合概念。
@@ -179,7 +183,7 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 }
 ```
 
-但是如果`B != C`会发生什么？我们如何组合两个这样的函数？
+但是如果`B != C`会发生什么？我们如何组合两个这样的函数？我们应该就此放弃吗？
 
 在接下来的章节中，我们将了解在什么条件下可以进行这种组合。
 
@@ -187,7 +191,7 @@ function pipe<A, B, C>(a: A, f: (a: A) => B, g: (b: B) => C): C {
 
 - 要组合`f: (a: A) => B`与`g: (b: B) => C`，我们使用常用的函数组合。
 - 要组合`f: (a: A) => F<B>`与`g: (b: B) => C`，我们需要`F`的 **函子（functor）** 实例。
-- 要组合`f: (a: A) => F<B>` with `g: (b: B, c: C) => D`，我们需要`F`的 **应用函子（applicative functor）** 实例。
+- 要组合`f: (a: A) => F<B>`与`g: (b: B, c: C) => D`，我们需要`F`的 **应用函子（applicative functor）** 实例。
 - 要组合`f: (a: A) => F<B>`与`g: (b: B) => F<C>`，我们需要`F`的 **单子（monad）** 实例。
 
 <img src="../../images/spoiler.png" width="900" alt="The four composition recipes" />

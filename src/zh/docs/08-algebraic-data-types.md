@@ -14,7 +14,7 @@
 两个常见的代数数据类型系列是：
 
 - **积类型(product type)**
-- **和类型(sum product)**
+- **和类型(sum type)**
 
 <img src="../../images/adt.png" width="400" alt="ADT" />
 
@@ -24,7 +24,7 @@
 
 积类型是由集合`I`索引的类型 T<sub>i</sub> 的集合。
 
-该系列的两个成员分别是n元组，其中`I`是自然数：
+该系列的两个成员分别是n元组，其中`I`是自然数的一个区间：
 
 ```ts
 type Tuple1 = [string]; // I = [0]
@@ -76,9 +76,7 @@ C([A, B]) = C(A) * C(B);
 
 `null` 类型的基数为1，因为它只有一个成员：`null`。
 
-**例**：
-
-`boolean`类型的基数为2，因为它有两个成员：`true`和`false`。
+**测验**：`boolean`类型的基数是多少？
 
 **例**：
 
@@ -122,15 +120,19 @@ type Clock = [Hour, Period];
 在TypeScript'的官方文档中它们被称作[可辨识联合(discriminated union)](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions).
 
 需要注意的是，联合的成员必须**不相交(disjoint)**，不能有属于多个成员的值。
-**注**：可辨识联合(discriminated union)，联合类型(union type)，不相交并集(disjoint union)在本节中是同义的。
+**注**：不相交并集(disjoint union)、和类型(sum type)、带标签的联合(tagged union)在本节中是同义的。
 
 **例**：
 
 ```ts
 type StringsOrNumbers = ReadonlyArray<string> | ReadonlyArray<number>;
+
+declare const sn: StringsOrNumbers;
+
+sn.map(); // error: This expression is not callable.
 ```
 
-不是不相交并集，因为`[]`同时属于两个成员。
+不是不相交并集，因为`[]`（空数组）同时属于两个成员。
 
 **测验**：下面的集合是不相交的吗？
 
@@ -444,7 +446,7 @@ declare function readFile(path: string): Promise<string>;
 f': X ⟶ Option(Y)
 ```
 
-现在我们对TypeScript中的联合类型有了更多的了解，我们可以毫无问题地定义`Option`。
+现在我们对TypeScript中的和类型有了更多的了解，我们可以毫无问题地定义`Option`。
 
 ### `Option`类型
 
@@ -787,7 +789,7 @@ import { last } from 'fp-ts/Semigroup';
 interface Settings {
   /** 控制 font family */
   readonly fontFamily: Option<string>;
-  /** 控制 font size */
+  /** 控制 font size（以像素为单位） */
   readonly fontSize: Option<number>;
   /** 限制渲染minimap时使用的列数 */
   readonly maxColumn: Option<number>;
@@ -824,9 +826,11 @@ console.log(monoidSettings.concat(workspaceSettings, userSettings));
 
 ### `Either`类型
 
-`Either`的常见用途是作为`Option`的替代方案来处理可能失败的计算的影响，同时能够指定失败的原因。
+我们已经看到，`Option`数据类型可以用来处理偏函数，而偏函数通常表示可能失败或抛出异常的计算。
 
-在此用法中，`None`被`Left`替代，其中包含有关错误的有用信息。`Right`代替`Some`。
+不过在某些场景下，这种数据类型可能会显得力不从心。成功时我们会得到包含类型`A`的信息的`Some<A>`，而另一个成员`None`却不携带任何数据。我们知道计算失败了，但不知道失败的原因。
+
+为了解决这个问题，我们只需要另一种表示失败的数据类型，我们称之为`Left<E>`。同时，我们还会用`Right<A>`来代替`Some<A>`。
 
 ```ts
 // 代表失败

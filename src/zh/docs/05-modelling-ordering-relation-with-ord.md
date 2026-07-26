@@ -128,7 +128,7 @@ const max = flow(reverse, min);
 pipe(2, max(N.Ord)(1), console.log); // => 2
 ```
 
-当谈到数字时，**全序**可能非常显而易见。但并不总是这样。让我们看一个稍微复杂一点的场景：
+当谈到数字时，排序的**全性(totality)**（意味着对任意给定的`x`和`y`，`x <= y`或`y <= x`两个条件中必有一个成立）可能非常显而易见。但并不总是这样。让我们看一个稍微复杂一点的场景：
 
 ```ts
 type User = {
@@ -258,7 +258,7 @@ console.log(
 ```ts
 interface Customer {
   readonly name: string;
-  readonly favoriteThings: ReadonlyArray<string>;
+  readonly favouriteThings: ReadonlyArray<string>;
   readonly registeredAt: number; // 时间戳(自1970)
   readonly lastUpdatedAt: number; // 时间戳(自1970)
   readonly hasMadePurchase: boolean;
@@ -278,11 +278,19 @@ import * as RA from 'fp-ts/ReadonlyArray';
 import { max, min, Semigroup, struct } from 'fp-ts/Semigroup';
 import * as S from 'fp-ts/string';
 
+interface Customer {
+  readonly name: string;
+  readonly favouriteThings: ReadonlyArray<string>;
+  readonly registeredAt: number; // 时间戳(自1970)
+  readonly lastUpdatedAt: number; // 时间戳(自1970)
+  readonly hasMadePurchase: boolean;
+}
+
 const SemigroupCustomer: Semigroup<Customer> = struct({
   // 保留长的那个
   name: max(pipe(N.Ord, contramap(S.size))),
   // 累加
-  favoriteThings: RA.getSemigroup<string>(),
+  favouriteThings: RA.getSemigroup<string>(),
   // 保留最早的日期
   registeredAt: min(N.Ord),
   // 保留最新的日期
@@ -295,14 +303,14 @@ console.log(
   SemigroupCustomer.concat(
     {
       name: 'Giulio',
-      favoriteThings: ['math', 'climbing'],
+      favouriteThings: ['math', 'climbing'],
       registeredAt: new Date(2018, 1, 20).getTime(),
       lastUpdatedAt: new Date(2018, 2, 18).getTime(),
       hasMadePurchase: false,
     },
     {
       name: 'Giulio Canti',
-      favoriteThings: ['functional programming'],
+      favouriteThings: ['functional programming'],
       registeredAt: new Date(2018, 1, 22).getTime(),
       lastUpdatedAt: new Date(2018, 2, 9).getTime(),
       hasMadePurchase: true,
